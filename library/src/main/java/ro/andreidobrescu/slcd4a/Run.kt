@@ -4,7 +4,10 @@ import ro.andreidobrescu.slcd4a.functional_interfaces.Procedure
 import ro.andreidobrescu.slcd4a.functional_interfaces.Supplier
 import ro.andreidobrescu.slcd4a.functional_interfaces.toSupplier
 import ro.andreidobrescu.slcd4a.future.Future
-import ro.andreidobrescu.slcd4a.ui_thread.UIThreadRunner
+import ro.andreidobrescu.slcd4a.thread.ThreadIsRunningFlag
+import ro.andreidobrescu.slcd4a.thread.ThreadRunner
+import ro.andreidobrescu.slcd4a.thread.UIThreadRunner
+import ro.andreidobrescu.slcd4a.workflow.WorkflowContext
 
 object Run
 {
@@ -13,13 +16,16 @@ object Run
      */
 
     @JvmStatic
-    fun thread(task : Procedure)
-    {
-        Thread {
-            try { task.invoke() }
-            catch (ex : Throwable) { SLCD4A.exceptionLogger.log(ex) }
-        }.start()
-    }
+    fun thread(task : Procedure) =
+        ThreadRunner.run(task)
+
+    @JvmStatic
+    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, task : Procedure) =
+        ThreadRunner.run(task, threadIsRunningFlag)
+
+    @JvmStatic
+    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, task : Procedure) =
+        ThreadRunner.runIfNotAlreadyRunning(task, threadIsRunningFlag)
 
     @JvmStatic
     fun onUiThread(task : Procedure) =
@@ -37,7 +43,13 @@ object Run
     fun <T> async(task : Supplier<T>) =
         Future(task)
 
-//todo    Run.workflow -> Workflow
-//todo    Run.ifNotAlreadyRunning -> Once<Thread>
+    /*
+     * Workflow
+     */
+
+    @JvmStatic
+    fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
+        dslBlock.invoke(WorkflowContext())
+
 //todo    Run.actor -> Actor / Single-threaded message queue
 }

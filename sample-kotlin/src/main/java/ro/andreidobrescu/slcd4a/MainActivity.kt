@@ -22,5 +22,7 @@ class MainActivity : AppCompatActivity()
             .onError { println("It was error! $it") }
             .onSuccess { println("It was success! $it") }
         }
+
+        SyncService.start()
     }
 }

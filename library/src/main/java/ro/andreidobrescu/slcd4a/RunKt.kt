@@ -4,6 +4,7 @@ import ro.andreidobrescu.slcd4a.functional_interfaces.toConsumer
 import ro.andreidobrescu.slcd4a.functional_interfaces.toProcedure
 import ro.andreidobrescu.slcd4a.functional_interfaces.toSupplier
 import ro.andreidobrescu.slcd4a.future.Future
+import ro.andreidobrescu.slcd4a.thread.ThreadIsRunningFlag
 
 //Kotlin functional interfaces compatibility layer
 
@@ -13,6 +14,12 @@ import ro.andreidobrescu.slcd4a.future.Future
 
 fun Run.thread(task : () -> (Unit)) =
     Run.thread(task.toProcedure())
+
+fun Run.thread(threadIsRunningFlag : ThreadIsRunningFlag, task : () -> (Unit)) =
+    Run.thread(threadIsRunningFlag, task.toProcedure())
+
+fun Run.threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, task : () -> (Unit)) =
+    Run.threadIfNotAlreadyRunning(threadIsRunningFlag, task.toProcedure())
 
 fun Run.onUiThread(task : () -> (Unit)) =
     Run.onUiThread(task.toProcedure())

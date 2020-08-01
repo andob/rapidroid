@@ -1,5 +1,6 @@
-package ro.andreidobrescu.slcd4a.ui_thread
+package ro.andreidobrescu.slcd4a.thread
 
+import ro.andreidobrescu.slcd4a.SLCD4A
 import ro.andreidobrescu.slcd4a.functional_interfaces.Procedure
 import ro.andreidobrescu.slcd4a.functional_interfaces.toRunnable
 
@@ -25,7 +26,8 @@ object UIThreadRunner
             }!!
 
             return@lazy implementation@ { toRun : Procedure ->
-                postMethod.invoke(handler, toRun.toRunnable())
+                try { postMethod.invoke(handler, toRun.toRunnable()) }
+                catch (ex : Throwable) { SLCD4A.exceptionLogger.log(ex) }
                 return@implementation Unit
             }
         }
@@ -39,7 +41,8 @@ object UIThreadRunner
             }!!
 
             return@lazy implementation@ { toRun : Procedure ->
-                invokeLaterMethod.invoke(null, toRun.toRunnable())
+                try { invokeLaterMethod.invoke(null, toRun.toRunnable()) }
+                catch (ex : Throwable) { SLCD4A.exceptionLogger.log(ex) }
                 return@implementation Unit
             }
         }
