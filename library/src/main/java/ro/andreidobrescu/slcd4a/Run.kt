@@ -1,5 +1,6 @@
 package ro.andreidobrescu.slcd4a
 
+import ro.andreidobrescu.slcd4a.actor.Actor
 import ro.andreidobrescu.slcd4a.functional_interfaces.Procedure
 import ro.andreidobrescu.slcd4a.functional_interfaces.Supplier
 import ro.andreidobrescu.slcd4a.functional_interfaces.toSupplier
@@ -51,5 +52,11 @@ object Run
     fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
         dslBlock.invoke(WorkflowContext())
 
-//todo    Run.actor -> Actor / Single-threaded message queue
+    /*
+     * Actor
+     */
+
+    @JvmStatic
+    fun <EVENT> eventOnActor(actor : Actor<EVENT>, event : EVENT) =
+        actor.enqueueEvent(event)
 }

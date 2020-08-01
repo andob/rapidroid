@@ -21,5 +21,9 @@ public class Main
         .onAny(() -> System.out.println("Any was called!"))
         .onError(ex -> System.out.println("It was error!"))
         .onSuccess(x -> System.out.println("It was successful! "+x));
+
+        for(int i=1; i<=100; i++)
+//            Run.eventOnActor(ShowMessageActor.Instance, new ShowMessageEvent("count"+i));
+            ShowMessageActor.Instance.enqueueEvent(new ShowMessageEvent("count: "+i));
     }
 }
