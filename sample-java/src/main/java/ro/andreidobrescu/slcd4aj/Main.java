@@ -23,7 +23,6 @@ public class Main
         .onSuccess(x -> System.out.println("It was successful! "+x));
 
         for(int i=1; i<=100; i++)
-//            Run.eventOnActor(ShowMessageActor.Instance, new ShowMessageEvent("count"+i));
             ShowMessageActor.Instance.enqueueEvent(new ShowMessageEvent("count: "+i));
     }
 }

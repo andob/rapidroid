@@ -1,7 +1,6 @@
 package ro.andreidobrescu.slcd4a.actor
 
 import ro.andreidobrescu.slcd4a.Run
-import ro.andreidobrescu.slcd4a.functional_interfaces.Consumer
 import ro.andreidobrescu.slcd4a.thread.ThreadIsRunningFlag
 import ro.andreidobrescu.slcd4a.threadIfNotAlreadyRunning
 import java.util.concurrent.LinkedBlockingQueue
