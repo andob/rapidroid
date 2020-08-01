@@ -1,0 +1,4 @@
+include ':library'
+include ':sample-java'
+include ':sample-kotlin'
+rootProject.name = "slcd4a"
