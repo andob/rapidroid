@@ -35,4 +35,18 @@ class WorkflowTasksCollector
         block.invoke(collector)
         tasks.add(collector.toParallelRunner())
     }
+
+    fun <T> parallelList(itemsProvider : () -> (List<T>),
+                         itemSubtask : (T) -> (Unit))
+    {
+        tasks.add {
+            val items=itemsProvider()
+            if (items.isNotEmpty())
+            {
+                val collector=WorkflowTasksCollector(workflowContext)
+                items.map { item -> collector.task { itemSubtask(item) } }
+                collector.toParallelRunner().invoke()
+            }
+        }
+    }
 }

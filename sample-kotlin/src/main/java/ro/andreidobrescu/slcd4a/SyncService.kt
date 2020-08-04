@@ -20,6 +20,9 @@ object SyncService
                             task { println("3") }
                             task { println("4") }
                         }
+                        parallelList(
+                            itemsProvider = { listOf(6,7,8) },
+                            itemSubtask = { println(it) })
                         task { println("5") }
                     }
                 }
