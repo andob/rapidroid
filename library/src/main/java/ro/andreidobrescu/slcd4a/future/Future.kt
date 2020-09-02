@@ -58,6 +58,17 @@ class Future<RESULT>
         return this
     }
 
+    fun withCancellationToken(cancellationToken : CancellationToken) : Future<RESULT>
+    {
+        cancellationToken.addCancellationListener {
+            this.onSuccess=null
+            this.onError=null
+            this.onAny=null
+        }
+
+        return this
+    }
+
     private fun callOnSuccess(result : RESULT)
     {
         Run.onUiThread {
