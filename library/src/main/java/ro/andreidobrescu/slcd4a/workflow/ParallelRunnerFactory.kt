@@ -15,7 +15,10 @@ object ParallelRunnerFactory
                 return@lambda
 
             if (tasks.size==1)
+            {
                 tasks.first().invoke()
+                return@lambda
+            }
 
             val latch=CountDownLatch(tasks.size)
 
