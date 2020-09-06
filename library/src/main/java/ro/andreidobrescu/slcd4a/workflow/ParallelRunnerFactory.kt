@@ -1,20 +1,11 @@
 package ro.andreidobrescu.slcd4a.workflow
 
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
 object ParallelRunnerFactory
 {
-    private val threadPoolExecutor by lazy {
-        val threadPoolExecutor=ThreadPoolExecutor(6, 6, 1, TimeUnit.MINUTES, LinkedBlockingQueue(Int.MAX_VALUE))
-        threadPoolExecutor.setRejectedExecutionHandler { runnable, executor -> Thread(runnable).start() }
-        threadPoolExecutor.allowCoreThreadTimeOut(true)
-        return@lazy threadPoolExecutor
-    }
-
     fun newParallelRunner(workflowContext : WorkflowContext,
                           tasks : List<ComposableWorkflowTask>)
                         : ComposableWorkflowTask
@@ -32,7 +23,7 @@ object ParallelRunnerFactory
 
             for (task in tasks)
             {
-                threadPoolExecutor.execute {
+                workflowContext.threadPoolExecutor.execute {
                     try
                     {
                         workflowContext.withTransaction {

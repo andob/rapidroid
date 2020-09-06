@@ -2,12 +2,15 @@ package ro.andreidobrescu.slcd4a.thread
 
 import ro.andreidobrescu.slcd4a.SLCD4A
 import ro.andreidobrescu.slcd4a.functional_interfaces.Procedure
+import java.util.concurrent.ThreadPoolExecutor
 
 object ThreadRunner
 {
-    fun run(task : Procedure, threadIsRunningFlag : ThreadIsRunningFlag? = null)
+    fun run(task : Procedure,
+            threadIsRunningFlag : ThreadIsRunningFlag? = null,
+            threadPoolExecutor : ThreadPoolExecutor? = null)
     {
-        Thread {
+        val runnable=Runnable {
             try
             {
                 threadIsRunningFlag?.set(true)
@@ -22,7 +25,11 @@ object ThreadRunner
             {
                 threadIsRunningFlag?.set(false)
             }
-        }.start()
+        }
+
+        if (threadPoolExecutor!=null)
+            threadPoolExecutor.execute(runnable)
+        else Thread(runnable).start()
     }
 
     fun runIfNotAlreadyRunning(task : Procedure, threadIsRunningFlag : ThreadIsRunningFlag)

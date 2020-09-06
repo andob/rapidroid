@@ -1,8 +1,12 @@
 package ro.andreidobrescu.slcd4a.workflow
 
 import ro.andreidobrescu.slcd4a.SLCD4A
+import java.util.concurrent.ThreadPoolExecutor
 
 class WorkflowContext
+(
+    internal val threadPoolExecutor : ThreadPoolExecutor = WorkflowThreadPoolExecutors.DEFAULT
+)
 {
     private val errorNotifier = WorkflowErrorNotifier()
 

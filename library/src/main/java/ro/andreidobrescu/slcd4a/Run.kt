@@ -9,6 +9,7 @@ import ro.andreidobrescu.slcd4a.thread.ThreadIsRunningFlag
 import ro.andreidobrescu.slcd4a.thread.ThreadRunner
 import ro.andreidobrescu.slcd4a.thread.UIThreadRunner
 import ro.andreidobrescu.slcd4a.workflow.WorkflowContext
+import java.util.concurrent.ThreadPoolExecutor
 
 object Run
 {
@@ -59,4 +60,21 @@ object Run
     @JvmStatic
     fun <EVENT> eventOnActor(actor : Actor<EVENT>, event : EVENT) =
         actor.enqueueEvent(event)
+
+    /*
+     * On thread pool executor
+     */
+
+    @JvmStatic
+    fun onThreadPoolExecutor(threadPoolExecutor : ThreadPoolExecutor) =
+        RunOnThreadPoolExecutor(threadPoolExecutor)
+
+    class RunOnThreadPoolExecutor(private val threadPoolExecutor : ThreadPoolExecutor)
+    {
+        fun thread(task : Procedure) =
+            ThreadRunner.run(task, threadPoolExecutor = threadPoolExecutor)
+
+        fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
+            dslBlock.invoke(WorkflowContext(threadPoolExecutor))
+    }
 }
