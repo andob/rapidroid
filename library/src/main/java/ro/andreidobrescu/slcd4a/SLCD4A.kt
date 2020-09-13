@@ -9,7 +9,6 @@ object SLCD4A
         }
     }
 
-    //todo convert to fun interface on kotlin 1.4
     interface ExceptionLogger
     {
         fun log(ex : Throwable)
