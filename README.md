@@ -6,7 +6,7 @@ Some concurrency design patterns I use in my Android projects.
 
 ```
 repositories {
-    maven { url "http://maven.andob.info/repository/open_source" }
+    maven { url "https://maven.andob.info/repository/open_source" }
 }
 ```
 
