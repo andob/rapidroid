@@ -4,8 +4,6 @@ import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
 import java.util.concurrent.ThreadPoolExecutor
-import java.util.function.Consumer
-import java.util.function.Supplier
 
 class Future<RESULT>
 {
@@ -13,7 +11,9 @@ class Future<RESULT>
     @Volatile private var onError : Consumer<Throwable>? = null
     @Volatile private var onAny : Runnable? = null
 
-    fun onSuccess(onSuccess : Runnable) = also { this.onSuccess = Consumer { onSuccess.run() } }
+    fun onSuccess(onSuccess : Runnable) = also { this.onSuccess =
+        Consumer { onSuccess.run() }
+    }
     fun onSuccess(onSuccess : Consumer<RESULT>) = also { this.onSuccess = onSuccess }
     fun onError(onError : Consumer<Throwable>) = also { this.onError = onError }
     fun onAny(onAny : Runnable) = also { this.onAny = onAny }

@@ -3,7 +3,6 @@ package ro.andob.rapidroid.future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
 import ro.andob.rapidroid.thread.ThreadRunner;
 
 public class FutureThreadPoolExecutors

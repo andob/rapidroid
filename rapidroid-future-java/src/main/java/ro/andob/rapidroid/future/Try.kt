@@ -1,7 +1,6 @@
-package ro.andob.rapidroid
+package ro.andob.rapidroid.future
 
-import java.util.function.Consumer
-import java.util.function.Supplier
+import ro.andob.rapidroid.Rapidroid
 
 fun _try(lambda : Runnable) = Runnable {
     try
