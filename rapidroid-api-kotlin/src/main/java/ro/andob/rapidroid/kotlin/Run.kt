@@ -1,4 +1,4 @@
-package ro.andob.rapidroid
+package ro.andob.rapidroid.kotlin
 
 import ro.andob.rapidroid.actor.Actor
 import ro.andob.rapidroid.future.Future
@@ -66,6 +66,9 @@ object Run
     {
         fun thread(runnable : Runnable) =
             ThreadRunner.run(runnable, threadPoolExecutor = threadPoolExecutor)
+
+        fun <T> async(supplier : () -> T) : Future<T> =
+            Future(supplier, threadPoolExecutor)
 
         fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
             dslBlock.invoke(WorkflowContext(threadPoolExecutor))

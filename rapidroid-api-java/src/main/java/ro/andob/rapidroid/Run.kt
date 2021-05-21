@@ -72,6 +72,12 @@ object Run
         fun thread(runnable : Runnable) =
             ThreadRunner.run(runnable, threadPoolExecutor = threadPoolExecutor)
 
+        fun async(runnable : Runnable) : Future<Unit> =
+            Future({ runnable.run() }, threadPoolExecutor)
+
+        fun <T> async(supplier : Supplier<T>) : Future<T> =
+            Future(supplier, threadPoolExecutor)
+
         fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
             dslBlock.invoke(WorkflowContext(threadPoolExecutor))
     }

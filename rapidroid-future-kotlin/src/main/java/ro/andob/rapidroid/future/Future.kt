@@ -2,9 +2,9 @@ package ro.andob.rapidroid.future
 
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
-import kotlin.concurrent.thread
+import java.util.concurrent.ThreadPoolExecutor
 
-class Future<RESULT>(task : () -> RESULT)
+class Future<RESULT>
 {
     @Volatile private var onSuccess : ((RESULT) -> Unit)? = null
     @Volatile private var onError : ((Throwable) -> Unit)? = null
@@ -14,13 +14,19 @@ class Future<RESULT>(task : () -> RESULT)
     fun onError(onError : (Throwable) -> Unit) = also { this.onError = onError }
     fun onAny(onAny : () -> Unit) = also { this.onAny = onAny }
 
-    init
+    constructor(supplier : () -> RESULT) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
+
+    constructor
+    (
+        supplier : () -> RESULT,
+        threadPoolExecutor : ThreadPoolExecutor,
+    )
     {
-        thread(start = true) {
+        threadPoolExecutor.execute {
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()
-                val result = task.invoke()
+                val result = supplier.invoke()
                 val stopTimestampInMills = System.currentTimeMillis()
 
                 //hack: avoid race conditions

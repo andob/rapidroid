@@ -2,11 +2,11 @@ package ro.andob.rapidroid.future
 
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.function.Consumer
 import java.util.function.Supplier
-import kotlin.concurrent.thread
 
-class Future<RESULT>(supplier : Supplier<RESULT>)
+class Future<RESULT>
 {
     @Volatile private var onSuccess : Consumer<RESULT>? = null
     @Volatile private var onError : Consumer<Throwable>? = null
@@ -17,9 +17,15 @@ class Future<RESULT>(supplier : Supplier<RESULT>)
     fun onError(onError : Consumer<Throwable>) = also { this.onError = onError }
     fun onAny(onAny : Runnable) = also { this.onAny = onAny }
 
-    init
+    constructor(supplier : Supplier<RESULT>) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
+
+    constructor
+    (
+        supplier : Supplier<RESULT>,
+        threadPoolExecutor : ThreadPoolExecutor,
+    )
     {
-        thread(start = true) {
+        threadPoolExecutor.execute {
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()
