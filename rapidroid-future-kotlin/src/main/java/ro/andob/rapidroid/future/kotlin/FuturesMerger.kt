@@ -1,4 +1,4 @@
-package ro.andob.rapidroid.future
+package ro.andob.rapidroid.future.kotlin
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference

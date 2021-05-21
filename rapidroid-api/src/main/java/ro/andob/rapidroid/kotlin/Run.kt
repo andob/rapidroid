@@ -1,7 +1,7 @@
 package ro.andob.rapidroid.kotlin
 
 import ro.andob.rapidroid.actor.Actor
-import ro.andob.rapidroid.future.Future
+import ro.andob.rapidroid.future.kotlin.Future
 import ro.andob.rapidroid.thread.ThreadIsRunningFlag
 import ro.andob.rapidroid.thread.ThreadRunner
 import ro.andob.rapidroid.thread.UIThreadRunner

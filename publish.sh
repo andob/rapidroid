@@ -7,8 +7,7 @@ read -s -r MAVEN_PUBLISH_PASSWORD
 
 echo "Publishing..."
 
-./gradlew :rapidroid-api-java:publish
-./gradlew :rapidroid-api-kotlin:publish
+./gradlew :rapidroid-api:publish
 
 set +o allexport
 

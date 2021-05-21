@@ -1,4 +1,4 @@
-package ro.andob.rapidroid.future
+package ro.andob.rapidroid.future.kotlin
 
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
