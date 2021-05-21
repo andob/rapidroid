@@ -26,5 +26,26 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation project(":rapidroid-core")
+    api project(":rapidroid-core")
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            repositories.maven {
+                url 'https://maven.andob.info/repository/open_source/'
+                credentials {
+                    username "$System.env.MAVEN_PUBLISH_USERNAME"
+                    password "$System.env.MAVEN_PUBLISH_PASSWORD"
+                }
+            }
+
+            maven(MavenPublication) {
+                groupId 'ro.andob.rapidroid'
+                artifactId 'rapidroid-workflow'
+                version '1.1.3'
+                artifact(bundleReleaseAar)
+            }
+        }
+    }
 }
