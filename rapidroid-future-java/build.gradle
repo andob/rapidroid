@@ -17,31 +17,14 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures {
+        buildConfig = false
+    }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     implementation project(":rapidroid-core")
-}
-
-project.afterEvaluate {
-    publishing {
-        publications {
-            repositories.maven {
-                url 'https://maven.andob.info/repository/open_source/'
-                credentials {
-                    username "$System.env.MAVEN_PUBLISH_USERNAME"
-                    password "$System.env.MAVEN_PUBLISH_PASSWORD"
-                }
-            }
-
-            maven(MavenPublication) {
-                groupId 'ro.andob.rapidroid'
-                artifactId 'rapidroid-actor'
-                version '1.1.0'
-                artifact(bundleReleaseAar)
-            }
-        }
-    }
 }
