@@ -1,6 +1,6 @@
 package ro.andreidobrescu.rapidroid.thread
 
-import ro.andreidobrescu.rapidroid.rapidroid
+import ro.andreidobrescu.rapidroid.Rapidroid
 import ro.andreidobrescu.rapidroid.functional_interfaces.Procedure
 import ro.andreidobrescu.rapidroid.functional_interfaces.toRunnable
 
@@ -27,7 +27,7 @@ object UIThreadRunner
 
             return@lazy implementation@ { toRun : Procedure ->
                 try { postMethod.invoke(handler, toRun.toRunnable()) }
-                catch (ex : Throwable) { rapidroid.exceptionLogger.log(ex) }
+                catch (ex : Throwable) { Rapidroid.exceptionLogger.log(ex) }
                 return@implementation Unit
             }
         }
@@ -42,7 +42,7 @@ object UIThreadRunner
 
             return@lazy implementation@ { toRun : Procedure ->
                 try { invokeLaterMethod.invoke(null, toRun.toRunnable()) }
-                catch (ex : Throwable) { rapidroid.exceptionLogger.log(ex) }
+                catch (ex : Throwable) { Rapidroid.exceptionLogger.log(ex) }
                 return@implementation Unit
             }
         }

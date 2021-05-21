@@ -1,6 +1,6 @@
 package ro.andreidobrescu.rapidroid.workflow
 
-import ro.andreidobrescu.rapidroid.rapidroid
+import ro.andreidobrescu.rapidroid.Rapidroid
 import java.util.concurrent.ThreadPoolExecutor
 
 class WorkflowContext
@@ -29,7 +29,7 @@ class WorkflowContext
         catch (ex : Throwable)
         {
             errorNotifier.notify(ex)
-            rapidroid.exceptionLogger.log(ex)
+            Rapidroid.exceptionLogger.log(ex)
             throw ex
         }
     }
@@ -46,7 +46,7 @@ class WorkflowContext
         catch (ex : Throwable)
         {
             errorNotifier.notify(ex)
-            rapidroid.exceptionLogger.log(ex)
+            Rapidroid.exceptionLogger.log(ex)
             throw ex
         }
     }

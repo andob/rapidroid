@@ -1,7 +1,7 @@
 package ro.andreidobrescu.rapidroid.future
 
 import ro.andreidobrescu.rapidroid.Run
-import ro.andreidobrescu.rapidroid.rapidroid
+import ro.andreidobrescu.rapidroid.Rapidroid
 import ro.andreidobrescu.rapidroid.functional_interfaces.*
 import ro.andreidobrescu.rapidroid.onUiThread
 import kotlin.concurrent.thread
@@ -30,7 +30,7 @@ class Future<RESULT>
             }
             catch (ex : Throwable)
             {
-                rapidroid.exceptionLogger.log(ex)
+                Rapidroid.exceptionLogger.log(ex)
 
                 callOnError(ex)
             }

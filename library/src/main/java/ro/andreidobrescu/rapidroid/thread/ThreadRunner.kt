@@ -1,6 +1,6 @@
 package ro.andreidobrescu.rapidroid.thread
 
-import ro.andreidobrescu.rapidroid.rapidroid
+import ro.andreidobrescu.rapidroid.Rapidroid
 import ro.andreidobrescu.rapidroid.functional_interfaces.Procedure
 import java.util.concurrent.ThreadPoolExecutor
 
@@ -19,7 +19,7 @@ object ThreadRunner
             }
             catch (ex : Throwable)
             {
-                rapidroid.exceptionLogger.log(ex)
+                Rapidroid.exceptionLogger.log(ex)
             }
             finally
             {
