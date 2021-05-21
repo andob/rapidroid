@@ -1,5 +1,6 @@
 package ro.andob.rapidroid.kotlin
 
+import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.actor.Actor
 import ro.andob.rapidroid.future.kotlin.Future
 import ro.andob.rapidroid.thread.ThreadIsRunningFlag
@@ -15,20 +16,20 @@ object Run
      */
 
     @JvmStatic
-    fun thread(runnable : Runnable) =
-        ThreadRunner.run(runnable)
+    fun thread(procedure : () -> Unit) =
+        ThreadRunner.run(procedure)
 
     @JvmStatic
-    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, runnable : Runnable) =
-        ThreadRunner.run(runnable, threadIsRunningFlag)
+    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : () -> Unit) =
+        ThreadRunner.run(procedure, threadIsRunningFlag)
 
     @JvmStatic
-    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, runnable : Runnable) =
-        ThreadRunner.runIfNotAlreadyRunning(runnable, threadIsRunningFlag)
+    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : () -> Unit) =
+        ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
 
     @JvmStatic
-    fun onUiThread(runnable : Runnable) =
-        UIThreadRunner.runOnUIThread(runnable)
+    fun onUiThread(procedure : () -> Unit) =
+        UIThreadRunner.runOnUIThread(procedure)
 
     /*
      * Futures
@@ -43,7 +44,7 @@ object Run
      */
 
     @JvmStatic
-    fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
+    fun workflow(dslBlock : WorkflowContext.() -> Unit) =
         dslBlock.invoke(WorkflowContext())
 
     /*
@@ -64,8 +65,8 @@ object Run
 
     class RunOnThreadPoolExecutor(private val threadPoolExecutor : ThreadPoolExecutor)
     {
-        fun thread(runnable : Runnable) =
-            ThreadRunner.run(runnable, threadPoolExecutor = threadPoolExecutor)
+        fun thread(procedure : () -> Unit) =
+            ThreadRunner.run(procedure, threadPoolExecutor = threadPoolExecutor)
 
         fun <T> async(supplier : () -> T) : Future<T> =
             Future(supplier, threadPoolExecutor)

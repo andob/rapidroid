@@ -16,28 +16,28 @@ object Run
      */
 
     @JvmStatic
-    fun thread(runnable : Runnable) =
-        ThreadRunner.run(runnable)
+    fun thread(procedure : Procedure) =
+        ThreadRunner.run(procedure)
 
     @JvmStatic
-    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, runnable : Runnable) =
-        ThreadRunner.run(runnable, threadIsRunningFlag)
+    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) =
+        ThreadRunner.run(procedure, threadIsRunningFlag)
 
     @JvmStatic
-    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, runnable : Runnable) =
-        ThreadRunner.runIfNotAlreadyRunning(runnable, threadIsRunningFlag)
+    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) =
+        ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
 
     @JvmStatic
-    fun onUiThread(runnable : Runnable) =
-        UIThreadRunner.runOnUIThread(runnable)
+    fun onUiThread(procedure : Procedure) =
+        UIThreadRunner.runOnUIThread(procedure)
 
     /*
      * Futures
      */
 
     @JvmStatic
-    fun async(runnable : Runnable) : Future<Unit> =
-        Future { runnable.run() }
+    fun async(procedure : Procedure) : Future<Unit> =
+        Future { procedure.call() }
 
     @JvmStatic
     fun <T> async(supplier : Supplier<T>) : Future<T> =
@@ -69,11 +69,11 @@ object Run
 
     class RunOnThreadPoolExecutor(private val threadPoolExecutor : ThreadPoolExecutor)
     {
-        fun thread(runnable : Runnable) =
-            ThreadRunner.run(runnable, threadPoolExecutor = threadPoolExecutor)
+        fun thread(procedure : Procedure) =
+            ThreadRunner.run(procedure, threadPoolExecutor = threadPoolExecutor)
 
-        fun async(runnable : Runnable) : Future<Unit> =
-            Future({ runnable.run() }, threadPoolExecutor)
+        fun async(procedure : Procedure) : Future<Unit> =
+            Future({ procedure.call() }, threadPoolExecutor)
 
         fun <T> async(supplier : Supplier<T>) : Future<T> =
             Future(supplier, threadPoolExecutor)

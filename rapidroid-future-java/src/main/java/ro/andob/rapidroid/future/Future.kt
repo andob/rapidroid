@@ -1,6 +1,7 @@
 package ro.andob.rapidroid.future
 
 import ro.andob.rapidroid.CancellationToken
+import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
 import java.util.concurrent.ThreadPoolExecutor
@@ -9,14 +10,12 @@ class Future<RESULT>
 {
     @Volatile private var onSuccess : Consumer<RESULT>? = null
     @Volatile private var onError : Consumer<Throwable>? = null
-    @Volatile private var onAny : Runnable? = null
+    @Volatile private var onAny : Procedure? = null
 
-    fun onSuccess(onSuccess : Runnable) = also { this.onSuccess =
-        Consumer { onSuccess.run() }
-    }
+    fun onSuccess(onSuccess : Procedure) = also { this.onSuccess = Consumer { onSuccess.call() } }
     fun onSuccess(onSuccess : Consumer<RESULT>) = also { this.onSuccess = onSuccess }
     fun onError(onError : Consumer<Throwable>) = also { this.onError = onError }
-    fun onAny(onAny : Runnable) = also { this.onAny = onAny }
+    fun onAny(onAny : Procedure) = also { this.onAny = onAny }
 
     constructor(supplier : Supplier<RESULT>) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
 
@@ -63,7 +62,7 @@ class Future<RESULT>
     private fun callOnSuccess(result : RESULT)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.run()
+            onAny?.call()
             onSuccess?.accept(result)
 
             onAny = null
@@ -75,7 +74,7 @@ class Future<RESULT>
     private fun callOnError(ex : Throwable)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.run()
+            onAny?.call()
             onError?.accept(ex)
 
             onAny = null

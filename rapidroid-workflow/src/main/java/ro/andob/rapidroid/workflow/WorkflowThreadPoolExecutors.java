@@ -13,7 +13,7 @@ public final class WorkflowThreadPoolExecutors
     static
     {
         DEFAULT=new ThreadPoolExecutor(6, 6, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>(Integer.MAX_VALUE));
-        DEFAULT.setRejectedExecutionHandler(((runnable, executor) -> ThreadRunner.run(runnable)));
+        DEFAULT.setRejectedExecutionHandler(((runnable, executor) -> ThreadRunner.run(runnable::run)));
         DEFAULT.allowCoreThreadTimeOut(true);
     }
 }

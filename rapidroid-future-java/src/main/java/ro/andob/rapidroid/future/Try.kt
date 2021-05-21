@@ -1,11 +1,12 @@
 package ro.andob.rapidroid.future
 
+import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
 
-fun _try(lambda : Runnable) = Runnable {
+fun _try(lambda : Procedure) = Procedure {
     try
     {
-        lambda.run()
+        lambda.call()
     }
     catch (ex : Exception)
     {

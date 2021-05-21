@@ -1,27 +1,28 @@
 package ro.andob.rapidroid.thread
 
+import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
 import java.util.concurrent.ThreadPoolExecutor
 
 object ThreadRunner
 {
     @JvmStatic
-    fun run(runnable : Runnable) = run(runnable, null, null)
+    fun run(procedure : Procedure) = run(procedure, null, null)
 
     @JvmStatic
     fun run
     (
-        runnable : Runnable,
+        procedure : Procedure,
         threadIsRunningFlag : ThreadIsRunningFlag? = null,
         threadPoolExecutor : ThreadPoolExecutor? = null
     )
     {
-        val wrappedRunnable = Runnable {
+        val runnable = Runnable {
             try
             {
                 threadIsRunningFlag?.set(true)
 
-                runnable.run()
+                procedure.call()
             }
             catch (ex : Throwable)
             {
@@ -34,13 +35,13 @@ object ThreadRunner
         }
 
         if (threadPoolExecutor!=null)
-            threadPoolExecutor.execute(wrappedRunnable)
+            threadPoolExecutor.execute(runnable)
         else Thread(runnable).start()
     }
 
-    fun runIfNotAlreadyRunning(task : Runnable, threadIsRunningFlag : ThreadIsRunningFlag)
+    fun runIfNotAlreadyRunning(procedure : Procedure, threadIsRunningFlag : ThreadIsRunningFlag)
     {
         if (!threadIsRunningFlag.get())
-            run(task, threadIsRunningFlag)
+            run(procedure, threadIsRunningFlag)
     }
 }
