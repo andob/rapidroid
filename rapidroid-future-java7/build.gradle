@@ -5,7 +5,7 @@ apply plugin: 'maven-publish'
 android {
     compileSdkVersion 30
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 30
     }
 
@@ -42,7 +42,7 @@ project.afterEvaluate {
 
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
-                artifactId 'rapidroid-futures-java'
+                artifactId 'rapidroid-futures-java7'
                 version '1.1.4'
                 artifact(bundleReleaseAar)
             }

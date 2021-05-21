@@ -26,7 +26,10 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    api project(":rapidroid-core")
+    implementation project(":rapidroid-core")
+    implementation project(":rapidroid-actor")
+    implementation project(":rapidroid-future-java7")
+    implementation project(":rapidroid-workflow")
 }
 
 project.afterEvaluate {
@@ -42,7 +45,7 @@ project.afterEvaluate {
 
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
-                artifactId 'rapidroid-futures-java'
+                artifactId 'rapidroid-api-java7'
                 version '1.1.4'
                 artifact(bundleReleaseAar)
             }

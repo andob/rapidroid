@@ -1,4 +1,4 @@
-package ro.andob.rapidroid.future.kotlin
+package ro.andob.rapidroid
 
 import java.util.*
 

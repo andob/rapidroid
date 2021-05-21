@@ -1,5 +1,6 @@
 package ro.andob.rapidroid.future
 
+import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
 import java.util.concurrent.ThreadPoolExecutor

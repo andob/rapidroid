@@ -1,4 +1,4 @@
-package ro.andob.rapidroid.future.kotlin
+package ro.andob.rapidroid.future
 
 import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Rapidroid
@@ -7,19 +7,22 @@ import java.util.concurrent.ThreadPoolExecutor
 
 class Future<RESULT>
 {
-    @Volatile private var onSuccess : ((RESULT) -> Unit)? = null
-    @Volatile private var onError : ((Throwable) -> Unit)? = null
-    @Volatile private var onAny : (() -> Unit)? = null
+    @Volatile private var onSuccess : Consumer<RESULT>? = null
+    @Volatile private var onError : Consumer<Throwable>? = null
+    @Volatile private var onAny : Runnable? = null
 
-    fun onSuccess(onSuccess : (RESULT) -> Unit) = also { this.onSuccess = onSuccess }
-    fun onError(onError : (Throwable) -> Unit) = also { this.onError = onError }
-    fun onAny(onAny : () -> Unit) = also { this.onAny = onAny }
+    fun onSuccess(onSuccess : Runnable) = also { this.onSuccess =
+        Consumer { onSuccess.run() }
+    }
+    fun onSuccess(onSuccess : Consumer<RESULT>) = also { this.onSuccess = onSuccess }
+    fun onError(onError : Consumer<Throwable>) = also { this.onError = onError }
+    fun onAny(onAny : Runnable) = also { this.onAny = onAny }
 
-    constructor(supplier : () -> RESULT) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
+    constructor(supplier : Supplier<RESULT>) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
 
     constructor
     (
-        supplier : () -> RESULT,
+        supplier : Supplier<RESULT>,
         threadPoolExecutor : ThreadPoolExecutor,
     )
     {
@@ -27,7 +30,7 @@ class Future<RESULT>
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()
-                val result = supplier.invoke()
+                val result = supplier.get()
                 val stopTimestampInMills = System.currentTimeMillis()
 
                 //hack: avoid race conditions
@@ -60,8 +63,8 @@ class Future<RESULT>
     private fun callOnSuccess(result : RESULT)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.invoke()
-            onSuccess?.invoke(result)
+            onAny?.run()
+            onSuccess?.accept(result)
 
             onAny = null
             onSuccess = null
@@ -72,8 +75,8 @@ class Future<RESULT>
     private fun callOnError(ex : Throwable)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.invoke()
-            onError?.invoke(ex)
+            onAny?.run()
+            onError?.accept(ex)
 
             onAny = null
             onSuccess = null
