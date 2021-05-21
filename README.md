@@ -1,4 +1,4 @@
-# SLCD4A - Simple Lightweight Concurrency Design Patterns For Android
+# rapidroid = rapid + android - Simple Lightweight Concurrency Design Patterns For Android
 
 Some concurrency design patterns I use in my Android projects.
 
@@ -12,7 +12,7 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.slcd4a:slcd4a:1.0.5'
+    implementation 'ro.andob.rapidroid:rapidroid:1.1.0'
 }
 `````
 
@@ -72,7 +72,7 @@ object SyncService
 }
 ```
 
-![workflow](https://raw.githubusercontent.com/andob/slcd4a/master/docs/workflow.png)
+![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/docs/workflow.png)
 
 NOTE: the code inside the ``task {}`` block must run synchronously / blocking. Do NOT create new threads inside ``task {}``, but if you do, please join them into the parent thread. For instance, if you're using RxJava or other concurrency framework, you must call ``blockingGet()`` or similar.
 
