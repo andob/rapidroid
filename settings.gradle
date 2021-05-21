@@ -1,4 +1,6 @@
-include ':library'
-include ':sample-java'
-include ':sample-kotlin'
 rootProject.name = "rapidroid"
+include ':rapidroid-workflow'
+include ':rapidroid-core'
+include ':rapidroid-actor'
+include ':rapidroid-future-java'
+include ':rapidroid-future-kotlin'
