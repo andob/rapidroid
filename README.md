@@ -1,4 +1,4 @@
-# rapidroid = rapid + android - Simple Lightweight Concurrency Design Patterns For Android
+# rapidroid = rapid + android
 
 Some concurrency design patterns I use in my Android projects.
 
@@ -12,21 +12,31 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid:1.1.0'
+    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.1.6'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.1.6'
 }
 `````
 
-#### Basics
+#### Core
 
-To run a thread,
+To run a thread (example with the Java API):
 
 ```java
+import ro.andob.rapidroid.Run;
+
 Run.thread(() -> System.out.println("Hello!"));
 ```
 
-To run a thread only once,
+To run a thread only once (example with Kotlin API):
 
 ```java
+import ro.andob.rapidroid.kotlin.Run
+
 object SyncService
 {
     private val isRunning = ThreadIsRunningFlag()
@@ -41,11 +51,41 @@ object SyncService
 }
 ```
 
-#### Workflows
+#### Futures
 
-The workflow API lets you easily define and change how concurrent tasks gets executed. Based on the concept of composable lambdas (similar to Jetpack Compose), one can easily compose sequential / parallel / task blocks to describe the execution.
+A future is simply a task that does something / returns something on a background thread, then calls onSuccess/onError/onAny on the UI thread. Java API:
+
+```java
+import ro.andob.rapidroid.Run;
+
+Run.async(() ->
+{
+    System.out.println("Hello!");
+    return 4;
+})
+.onAny(() -> System.out.println("Any was called!"))
+.onError(ex -> System.out.println("Error!"))
+.onSuccess(x -> System.out.println("Success! "+x));
+```
+
+Kotlin API:
 
 ```kotlin
+import ro.andob.rapidroid.kotlin.Run;
+
+Run.async { 4 }
+   .onAny { println("Any was called!") }
+   .onError { ex -> println("Error!") }
+   .onSuccess { x -> println("Success! "+x) }
+```
+
+#### Workflows
+
+The workflow API lets you easily define and change how concurrent tasks gets executed. Based on the concept of composable lambdas (similar to Jetpack Compose), one can easily compose sequential / parallel / task blocks to describe the execution. Available only as a Kotlin API.
+
+```kotlin
+import ro.andob.rapidroid.kotlin.Run;
+
 object SyncService
 {
     private val isRunning = ThreadIsRunningFlag()
@@ -78,129 +118,32 @@ NOTE: the code inside the ``task {}`` block must run synchronously / blocking. D
 
 NOTE: The workflow spawns threads and then joins them into the parent thread. This means that, by calling ``Run.workflow``, you will block the current running thread. Do not call ``Run.workflow`` on UI thread. Wrap it inside a thread, like this: ``Run.thread { Run.workflow {} }``
 
-#### Futures
-
-Naive future implementation. It's simply a thread that does something, then calls onSuccess/onError/onAny on the UI thread.
-
-```java
-Run.async(() ->
-{
-    System.out.println("Hello!");
-    return 4;
-})
-.onAny(() -> System.out.println("Any was called!"))
-.onError(ex -> System.out.println("Error!"))
-.onSuccess(x -> System.out.println("Success! "+x));
-```
-
 #### Actors
 
-Naive single-threaded actor model / event queue implementation. Using an actor, you can process events sequentially from an event queue. Actors must be singleton objects - there must be only one object instance per actor class.
+Single-threaded actor model / event queue implementation. Using an actor, you can process events sequentially from an event queue. Actors must be singleton objects - there must be only one object instance per actor class. Example with the Kotlin API:
 
 ```java
-public class ShowMessageEvent
+class ShowMessageEvent(val message : String)
+```
+
+```java
+object ShowMessageActor : Actor<ShowMessageEvent>
 {
-    private final String message;
-
-    public ShowMessageEvent(String message)
+    override fun handleEvent(event : ShowMessageEvent)
     {
-        this.message = message;
-    }
-
-    @Override
-    public String toString()
-    {
-        return message;
+        println(event.message)
     }
 }
 ```
 
 ```java
-public class ShowMessageActor extends Actor<ShowMessageEvent>
-{
-    public static final ShowMessageActor Instance = new ShowMessageActor();
-
-    private ShowMessageActor() {}
-
-    @Override
-    public void handleEvent(ShowMessageEvent event)
-    {
-        System.out.println(event.toString());
-        
-        //heavy work here
-    }
-}
-```
-
-```java
-for(int i=1; i<=100; i++)
-    ShowMessageActor.Instance.enqueueEvent(new ShowMessageEvent("count: "+i));
-```
-
-#### Thread pools
-
-One can specify a custom thread pool executor, for instance, this will run no more than 5 parallel threads at a given time:
-
-```kotlin
-@JvmStatic
-val MY_THREAD_POOL_EXECUTOR by lazy {
-    val executor=ThreadPoolExecutor(5, 5, 1, TimeUnit.MINUTES, LinkedBlockingQueue<>(Integer.MAX_VALUE))
-    executor.allowCoreThreadTimeOut(true)
-    return@lazy executor
-}
-```
-
-```kotlin
-Run.onThreadPoolExecutor(ThreadPoolExecutors.MY_THREAD_POOL_EXECUTOR)
-   .thread { println("do stuff") }
-```
-
-```kotlin
-Run.onThreadPoolExecutor(ThreadPoolExecutors.MY_THREAD_POOL_EXECUTOR)
-   .workflow {
-       parallel {
-           task { println("do this") }
-           task { println("do that") }
-       }
-   }
-```
-
-#### Some more synctactic sugar on workflows
-
-```kotlin
-val filesToUpload = listOf<File>()
-
-Run.workflow {
-    parallel {
-        task { println("something else") }
-        
-        filesToUpload.map { fileToUpload ->
-            task { uploadFileToServer(fileToUpload) }
-        }
-    }
-}
-```
-
-This can be also written as:
-
-```kotlin
-val filesToUpload = listOf<File>()
-
-Run.workflow {
-    parallel {
-        task { println("something else") }
-        
-        parallelList(
-            itemsProvider = { filesToUpload },
-            itemSubtask = { fileToUpload -> uploadFileToServer(fileToUpload) })
-    }
-}
+ShowMessageActor.enqueueEvent(ShowMessageEvent("Hello"))
 ```
 
 #### License
 
 ```
-Copyright 2020 Andrei Dobrescu
+Copyright 2020-2021 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
