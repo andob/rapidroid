@@ -12,13 +12,13 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-core:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.1.7'
-    implementation 'ro.andob.rapidroid:rapidroid-actor:1.1.7'
+    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.1.8'
 }
 `````
 
