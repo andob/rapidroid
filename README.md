@@ -118,6 +118,8 @@ NOTE: the code inside the ``task {}`` block must run synchronously / blocking. D
 
 NOTE: The workflow spawns threads and then joins them into the parent thread. This means that, by calling ``Run.workflow``, you will block the current running thread. Do not call ``Run.workflow`` on UI thread. Wrap it inside a thread, like this: ``Run.thread { Run.workflow {} }``
 
+NOTE: The parallel block does not run tasks as in "one thread per tasks". It runs tasks inside a thread pool executor, which limits the maximum number of tasks that run at a moment in time. This TPE is configurable via ``Run.withThreadPoolExecutor`` API.
+
 #### Actors
 
 Single-threaded actor model / event queue implementation. Using an actor, you can process events sequentially from an event queue. Actors must be singleton objects - there must be only one object instance per actor class. Example with the Kotlin API:
