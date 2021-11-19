@@ -46,7 +46,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
                 artifactId 'rapidroid-api-kotlin'
-                version '1.1.8'
+                version '1.1.9'
                 artifact(bundleReleaseAar)
             }
         }

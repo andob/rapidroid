@@ -12,13 +12,13 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-core:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.1.8'
-    implementation 'ro.andob.rapidroid:rapidroid-actor:1.1.8'
+    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.1.9'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.1.9'
 }
 `````
 
@@ -118,7 +118,7 @@ NOTE: the code inside the ``task {}`` block must run synchronously / blocking. D
 
 NOTE: The workflow spawns threads and then joins them into the parent thread. This means that, by calling ``Run.workflow``, you will block the current running thread. Do not call ``Run.workflow`` on UI thread. Wrap it inside a thread, like this: ``Run.thread { Run.workflow {} }``
 
-NOTE: The parallel block does not run tasks as in "one thread per tasks". It runs tasks inside a thread pool executor, which limits the maximum number of tasks that run at a moment in time. This TPE is configurable via ``Run.withThreadPoolExecutor`` API.
+NOTE: The parallel block does not run tasks as in "one thread per tasks". It runs tasks inside an executor, which limits the maximum number of tasks that run at a moment in time.
 
 #### Actors
 

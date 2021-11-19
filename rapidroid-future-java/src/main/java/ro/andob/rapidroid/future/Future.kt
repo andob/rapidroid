@@ -4,9 +4,9 @@ import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
-import java.util.concurrent.ThreadPoolExecutor
+import kotlin.concurrent.thread
 
-class Future<RESULT>
+class Future<RESULT>(supplier : Supplier<RESULT>)
 {
     @Volatile private var onSuccess : Consumer<RESULT>? = null
     @Volatile private var onError : Consumer<Throwable>? = null
@@ -17,15 +17,9 @@ class Future<RESULT>
     fun onError(onError : Consumer<Throwable>) = also { this.onError = onError }
     fun onAny(onAny : Procedure) = also { this.onAny = onAny }
 
-    constructor(supplier : Supplier<RESULT>) : this(supplier, FutureThreadPoolExecutors.DEFAULT)
-
-    constructor
-    (
-        supplier : Supplier<RESULT>,
-        threadPoolExecutor : ThreadPoolExecutor,
-    )
+    init
     {
-        threadPoolExecutor.execute {
+        thread(start = true) {
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()

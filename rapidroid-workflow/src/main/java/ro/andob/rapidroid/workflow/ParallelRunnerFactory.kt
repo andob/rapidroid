@@ -1,15 +1,16 @@
 package ro.andob.rapidroid.workflow
 
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
 
 object ParallelRunnerFactory
 {
     fun newParallelRunner
     (
         workflowContext : WorkflowContext,
-        tasks : List<() -> Unit>
+        numberOfThreads : Int,
+        tasks : List<() -> Unit>,
     ) : () -> Unit
     {
         return lambda@ {
@@ -22,35 +23,29 @@ object ParallelRunnerFactory
                 return@lambda
             }
 
-            val latch = CountDownLatch(tasks.size)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val futures = executor.invokeAll(tasks.map { Callable { it() } })
+            var error : Throwable? = null
 
-            val atomicError = AtomicReference<Exception>(null)
-
-            for (task in tasks)
+            try
             {
-                workflowContext.threadPoolExecutor.execute {
-                    try
-                    {
-                        workflowContext.withTransaction {
-                            task.invoke()
-                        }
-
-                        latch.countDown()
-                    }
-                    catch (ex : Exception)
-                    {
-                        atomicError.set(ex)
-
-                        while (latch.count>0)
-                            latch.countDown()
+                futures.forEach { future ->
+                    workflowContext.withTransaction {
+                        future.get()
                     }
                 }
             }
+            catch (ex : Exception)
+            {
+                error = (ex as? ExecutionException)?.cause?:ex
+            }
+            finally
+            {
+                executor.shutdownNow()
+            }
 
-            latch.await(Long.MAX_VALUE, TimeUnit.HOURS)
-
-            if (atomicError.get()!=null)
-                throw atomicError.get()!!
+            if (error!=null)
+                throw error
         }
     }
 }

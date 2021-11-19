@@ -17,29 +17,38 @@ class WorkflowTasksCollector
             workflowContext = workflowContext,
             tasks = tasks)
 
-    internal fun toParallelRunner() =
+    internal fun toParallelRunner(numberOfThreads : Int) =
         ParallelRunnerFactory.newParallelRunner(
             workflowContext = workflowContext,
+            numberOfThreads = numberOfThreads,
             tasks = tasks)
 
-    fun sequential(block : WorkflowTasksCollector.() -> (Unit))
+    fun sequential
+    (
+        block : WorkflowTasksCollector.() -> (Unit)
+    )
     {
         val collector = WorkflowTasksCollector(workflowContext)
         block.invoke(collector)
         tasks.add(collector.toSequentialRunner())
     }
 
-    fun parallel(block : WorkflowTasksCollector.() -> (Unit))
+    fun parallel
+    (
+        numberOfThreads : Int = WorkflowContext.DEFAULT_NUMBER_OF_THREADS,
+        block : WorkflowTasksCollector.() -> (Unit)
+    )
     {
         val collector = WorkflowTasksCollector(workflowContext)
         block.invoke(collector)
-        tasks.add(collector.toParallelRunner())
+        tasks.add(collector.toParallelRunner(numberOfThreads))
     }
 
     fun <T> parallelList
     (
         itemsProvider : () -> (List<T>),
-        itemSubtask : (T) -> (Unit)
+        itemSubtask : (T) -> (Unit),
+        numberOfThreads : Int = WorkflowContext.DEFAULT_NUMBER_OF_THREADS,
     )
     {
         tasks.add {
@@ -48,7 +57,7 @@ class WorkflowTasksCollector
             {
                 val collector = WorkflowTasksCollector(workflowContext)
                 items.map { item -> collector.task { itemSubtask(item) } }
-                collector.toParallelRunner().invoke()
+                collector.toParallelRunner(numberOfThreads).invoke()
             }
         }
     }

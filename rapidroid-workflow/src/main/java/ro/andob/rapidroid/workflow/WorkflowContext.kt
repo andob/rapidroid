@@ -1,23 +1,30 @@
 package ro.andob.rapidroid.workflow
 
 import ro.andob.rapidroid.Rapidroid
-import java.util.concurrent.ThreadPoolExecutor
 
 class WorkflowContext
-(
-    internal val threadPoolExecutor : ThreadPoolExecutor = WorkflowThreadPoolExecutors.DEFAULT
-)
 {
+    companion object
+    {
+        internal const val DEFAULT_NUMBER_OF_THREADS = 5
+    }
+
     private val errorNotifier = WorkflowErrorNotifier()
 
-    internal fun withTransaction(block : WorkflowContext.() -> (Unit))
+    internal fun withTransaction
+    (
+        block : WorkflowContext.() -> (Unit)
+    )
     {
         errorNotifier.throwOnError()
         block.invoke(this)
         errorNotifier.throwOnError()
     }
 
-    fun sequential(block : WorkflowTasksCollector.() -> (Unit))
+    fun sequential
+    (
+        block : WorkflowTasksCollector.() -> (Unit)
+    )
     {
         val collector = WorkflowTasksCollector(this)
         block.invoke(collector)
@@ -34,14 +41,18 @@ class WorkflowContext
         }
     }
 
-    fun parallel(block : WorkflowTasksCollector.() -> (Unit))
+    fun parallel
+    (
+        numberOfThreads : Int = DEFAULT_NUMBER_OF_THREADS,
+        block : WorkflowTasksCollector.() -> (Unit),
+    )
     {
         val collector = WorkflowTasksCollector(this)
         block.invoke(collector)
 
         try
         {
-            collector.toParallelRunner().invoke()
+            collector.toParallelRunner(numberOfThreads).invoke()
         }
         catch (ex : Throwable)
         {

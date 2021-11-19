@@ -2,19 +2,17 @@ package ro.andob.rapidroid.thread
 
 import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
-import java.util.concurrent.ThreadPoolExecutor
 
 object ThreadRunner
 {
     @JvmStatic
-    fun run(procedure : Procedure) = run(procedure, null, null)
+    fun run(procedure : Procedure) = run(procedure, null)
 
     @JvmStatic
     fun run
     (
         procedure : Procedure,
         threadIsRunningFlag : ThreadIsRunningFlag? = null,
-        threadPoolExecutor : ThreadPoolExecutor? = null
     )
     {
         val runnable = Runnable {
@@ -34,9 +32,7 @@ object ThreadRunner
             }
         }
 
-        if (threadPoolExecutor!=null)
-            threadPoolExecutor.execute(runnable)
-        else Thread(runnable).start()
+        Thread(runnable).start()
     }
 
     fun runIfNotAlreadyRunning(procedure : Procedure, threadIsRunningFlag : ThreadIsRunningFlag)
