@@ -3,7 +3,6 @@ package ro.andob.rapidroid.future.kotlin
 import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
-import kotlin.concurrent.thread
 
 class Future<RESULT>(supplier : () -> RESULT)
 {
@@ -17,7 +16,7 @@ class Future<RESULT>(supplier : () -> RESULT)
 
     init
     {
-        thread(start = true) {
+        FutureThreadPoolExecutors.DEFAULT.execute {
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()

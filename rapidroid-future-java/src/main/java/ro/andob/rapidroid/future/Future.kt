@@ -4,7 +4,6 @@ import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Procedure
 import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.UIThreadRunner
-import kotlin.concurrent.thread
 
 class Future<RESULT>(supplier : Supplier<RESULT>)
 {
@@ -19,7 +18,7 @@ class Future<RESULT>(supplier : Supplier<RESULT>)
 
     init
     {
-        thread(start = true) {
+        FutureThreadPoolExecutors.DEFAULT.execute {
             try
             {
                 val startTimestampInMills = System.currentTimeMillis()
