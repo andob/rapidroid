@@ -1,8 +1,7 @@
 package ro.andob.rapidroid.workflow
 
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
+import ro.andob.rapidroid.Rapidroid
+import java.util.concurrent.atomic.AtomicReference
 
 object ParallelRunnerFactory
 {
@@ -18,34 +17,57 @@ object ParallelRunnerFactory
                 return@lambda
 
             if (tasks.size==1)
-            {
-                tasks.first().invoke()
-                return@lambda
-            }
+                return@lambda tasks[0]()
 
-            val executor = Executors.newFixedThreadPool(numberOfThreads)
-            val futures = executor.invokeAll(tasks.map { Callable { it() } })
-            var error : Throwable? = null
+            val errorHolder = AtomicReference<Throwable>(null)
 
-            try
-            {
-                futures.forEach { future ->
-                    workflowContext.withTransaction {
-                        future.get()
-                    }
-                }
-            }
-            catch (ex : Exception)
-            {
-                error = (ex as? ExecutionException)?.cause?:ex
-            }
-            finally
-            {
-                executor.shutdownNow()
-            }
+            groupTasks(numberOfThreads, tasks)
+                .map { task -> createTaskThread(workflowContext, errorHolder, task) }
+                .map { thread -> thread.also { it.start() } }
+                .forEach { thread -> thread.tryJoin() }
 
-            if (error!=null)
-                throw error
+            errorHolder.get()?.let { throw it }
         }
     }
+
+    private fun groupTasks
+    (
+        numberOfThreads : Int,
+        tasks : List<() -> Unit>,
+    ) : List<() -> Unit>
+    {
+        val tasksGroups = Array(size = numberOfThreads,
+            init = { mutableListOf<() -> Unit>() })
+
+        for ((index, task) in tasks.shuffled().withIndex())
+        {
+            val groupIndex = index.mod(numberOfThreads)
+            tasksGroups[groupIndex].add(task)
+        }
+
+        return tasksGroups.map { taskGroup -> {
+            taskGroup.forEach { task -> task() }
+        } }
+    }
+
+    private fun createTaskThread
+    (
+        workflowContext : WorkflowContext,
+        errorHolder : AtomicReference<Throwable>,
+        task : () -> Unit,
+    ) = Thread {
+        try
+        {
+            workflowContext.withTransaction {
+                task.invoke()
+            }
+        }
+        catch (ex : Throwable)
+        {
+            errorHolder.set(ex)
+        }
+    }
+
+    private fun Thread.tryJoin() = try { join() }
+        catch (ex : InterruptedException) { Rapidroid.exceptionLogger.log(ex) }
 }

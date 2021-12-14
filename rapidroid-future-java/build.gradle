@@ -43,7 +43,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
                 artifactId 'rapidroid-futures-java'
-                version '1.2.1'
+                version '1.2.2'
                 artifact(bundleReleaseAar)
             }
         }
