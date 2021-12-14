@@ -15,15 +15,15 @@ object Run
      */
 
     @JvmStatic
-    fun thread(procedure : Procedure) =
+    fun thread(procedure : Procedure) : Thread =
         ThreadRunner.run(procedure)
 
     @JvmStatic
-    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) =
+    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread =
         ThreadRunner.run(procedure, threadIsRunningFlag)
 
     @JvmStatic
-    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) =
+    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread? =
         ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
 
     @JvmStatic

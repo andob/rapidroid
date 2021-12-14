@@ -13,7 +13,7 @@ object ThreadRunner
     (
         procedure : Procedure,
         threadIsRunningFlag : ThreadIsRunningFlag? = null,
-    )
+    ) : Thread
     {
         val runnable = Runnable {
             try
@@ -32,12 +32,15 @@ object ThreadRunner
             }
         }
 
-        Thread(runnable).start()
+        val thread = Thread(runnable)
+        thread.start()
+        return thread
     }
 
-    fun runIfNotAlreadyRunning(procedure : Procedure, threadIsRunningFlag : ThreadIsRunningFlag)
+    fun runIfNotAlreadyRunning(procedure : Procedure, threadIsRunningFlag : ThreadIsRunningFlag) : Thread?
     {
         if (!threadIsRunningFlag.get())
-            run(procedure, threadIsRunningFlag)
+            return run(procedure, threadIsRunningFlag)
+        return null
     }
 }
