@@ -3,10 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 32
     }
 
     compileOptions {
@@ -41,7 +41,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
                 artifactId 'rapidroid-core'
-                version '1.2.2'
+                version '1.2.3'
                 artifact(bundleReleaseAar)
             }
         }

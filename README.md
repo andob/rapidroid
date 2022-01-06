@@ -12,13 +12,11 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid-api-java:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-api-kotlin:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-core:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-java:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-futures-kotlin:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.2.2'
-    implementation 'ro.andob.rapidroid:rapidroid-actor:1.2.2'
+    implementation 'ro.andob.rapidroid:rapidroid-api:1.2.3'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.2.3'
+    implementation 'ro.andob.rapidroid:rapidroid-futures:1.2.3'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.2.3'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.2.3'
 }
 `````
 
@@ -27,16 +25,12 @@ dependencies {
 To run a thread (example with the Java API):
 
 ```java
-import ro.andob.rapidroid.Run;
-
 Run.thread(() -> System.out.println("Hello!"));
 ```
 
 To run a thread only once (example with Kotlin API):
 
 ```java
-import ro.andob.rapidroid.kotlin.Run
-
 object SyncService
 {
     private val isRunning = ThreadIsRunningFlag()
@@ -56,8 +50,6 @@ object SyncService
 A future is simply a task that does something / returns something on a background thread, then calls onSuccess/onError/onAny on the UI thread. Java API:
 
 ```java
-import ro.andob.rapidroid.Run;
-
 Run.async(() ->
 {
     System.out.println("Hello!");
@@ -71,8 +63,6 @@ Run.async(() ->
 Kotlin API:
 
 ```kotlin
-import ro.andob.rapidroid.kotlin.Run;
-
 Run.async { 4 }
    .onAny { println("Any was called!") }
    .onError { ex -> println("Error!") }
@@ -84,8 +74,6 @@ Run.async { 4 }
 The workflow API lets you easily define and change how concurrent tasks gets executed. Based on the concept of composable lambdas (similar to Jetpack Compose), one can easily compose sequential / parallel / task blocks to describe the execution. Available only as a Kotlin API.
 
 ```kotlin
-import ro.andob.rapidroid.kotlin.Run;
-
 object SyncService
 {
     private val isRunning = ThreadIsRunningFlag()
@@ -145,7 +133,7 @@ ShowMessageActor.enqueueEvent(ShowMessageEvent("Hello"))
 #### License
 
 ```
-Copyright 2020-2021 Andrei Dobrescu
+Copyright 2020-2022 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
