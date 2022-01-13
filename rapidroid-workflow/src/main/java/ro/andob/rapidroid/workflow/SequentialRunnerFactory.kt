@@ -11,7 +11,7 @@ object SequentialRunnerFactory
         return {
             for (task in tasks)
             {
-                workflowContext.withTransaction {
+                workflowContext.transactional {
                     task.invoke()
                 }
             }

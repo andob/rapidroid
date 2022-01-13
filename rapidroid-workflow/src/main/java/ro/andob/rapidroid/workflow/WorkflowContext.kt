@@ -9,9 +9,9 @@ class WorkflowContext
         internal const val DEFAULT_NUMBER_OF_THREADS = 5
     }
 
-    private val errorNotifier = WorkflowErrorNotifier()
+    internal val errorNotifier = WorkflowErrorNotifier()
 
-    internal fun withTransaction
+    internal fun transactional
     (
         block : WorkflowContext.() -> (Unit)
     )

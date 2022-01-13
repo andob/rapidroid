@@ -1,7 +1,6 @@
 package ro.andob.rapidroid.workflow
 
 import ro.andob.rapidroid.Rapidroid
-import java.util.concurrent.atomic.AtomicReference
 
 object ParallelRunnerFactory
 {
@@ -19,19 +18,18 @@ object ParallelRunnerFactory
             if (tasks.size==1)
                 return@lambda tasks[0]()
 
-            val errorHolder = AtomicReference<Throwable>(null)
-
-            groupTasks(numberOfThreads, tasks)
-                .map { task -> createTaskThread(workflowContext, errorHolder, task) }
+            groupTasks(workflowContext, numberOfThreads, tasks)
+                .map { task -> createTaskThread(workflowContext, task) }
                 .map { thread -> thread.also { it.start() } }
                 .forEach { thread -> thread.tryJoin() }
 
-            errorHolder.get()?.let { throw it }
+            workflowContext.errorNotifier.throwOnError()
         }
     }
 
     private fun groupTasks
     (
+        workflowContext : WorkflowContext,
         numberOfThreads : Int,
         tasks : List<() -> Unit>,
     ) : List<() -> Unit>
@@ -46,26 +44,21 @@ object ParallelRunnerFactory
         }
 
         return tasksGroups.map { taskGroup -> {
-            taskGroup.forEach { task -> task() }
+            taskGroup.forEach { task ->
+                workflowContext.transactional {
+                    task.invoke()
+                }
+            }
         } }
     }
 
     private fun createTaskThread
     (
         workflowContext : WorkflowContext,
-        errorHolder : AtomicReference<Throwable>,
         task : () -> Unit,
     ) = Thread {
-        try
-        {
-            workflowContext.withTransaction {
-                task.invoke()
-            }
-        }
-        catch (ex : Throwable)
-        {
-            errorHolder.set(ex)
-        }
+        try { task.invoke() }
+        catch (ex : Throwable) { workflowContext.errorNotifier.notify(ex) }
     }
 
     private fun Thread.tryJoin() = try { join() }
