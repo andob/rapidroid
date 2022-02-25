@@ -43,7 +43,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
                 artifactId 'rapidroid-workflow'
-                version '1.2.4'
+                version '1.2.5'
                 artifact(bundleReleaseAar)
             }
         }

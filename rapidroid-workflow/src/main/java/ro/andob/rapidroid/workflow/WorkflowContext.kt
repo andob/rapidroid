@@ -6,7 +6,7 @@ class WorkflowContext
 {
     companion object
     {
-        internal const val DEFAULT_NUMBER_OF_THREADS = 5
+        internal const val DEFAULT_NUMBER_OF_THREADS = 4
     }
 
     internal val errorNotifier = WorkflowErrorNotifier()

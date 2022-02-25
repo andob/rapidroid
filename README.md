@@ -12,11 +12,11 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid-api:1.2.4'
-    implementation 'ro.andob.rapidroid:rapidroid-core:1.2.4'
-    implementation 'ro.andob.rapidroid:rapidroid-futures:1.2.4'
-    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.2.4'
-    implementation 'ro.andob.rapidroid:rapidroid-actor:1.2.4'
+    implementation 'ro.andob.rapidroid:rapidroid-api:1.2.5'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.2.5'
+    implementation 'ro.andob.rapidroid:rapidroid-futures:1.2.5'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.2.5'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.2.5'
 }
 `````
 
