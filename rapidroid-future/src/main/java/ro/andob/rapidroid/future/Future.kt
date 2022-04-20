@@ -1,34 +1,44 @@
 package ro.andob.rapidroid.future
 
-import ro.andob.rapidroid.CancellationToken
-import ro.andob.rapidroid.Procedure
-import ro.andob.rapidroid.Rapidroid
-import ro.andob.rapidroid.Supplier
-import ro.andob.rapidroid.Consumer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import ro.andob.rapidroid.*
 import ro.andob.rapidroid.thread.UIThreadRunner
+import java.util.LinkedList
+import java.util.Queue
 
-class Future<RESULT>(supplier : Supplier<RESULT>)
+class Future<RESULT>(resultSupplier : Supplier<RESULT>)
 {
-    @Volatile private var onSuccess : ((RESULT) -> Unit)? = null
-    @JvmSynthetic fun onSuccess(onSuccess : (RESULT) -> Unit) = also { this.onSuccess = onSuccess }
-    fun onSuccess(onSuccess : Consumer<RESULT>) = also { this.onSuccess = { onSuccess.accept(it) } }
-    fun onSuccess(onSuccess : Procedure) = also { this.onSuccess = { onSuccess.call()} }
+    private val onSuccess : Queue<(RESULT) -> Unit> = LinkedList()
+    @JvmSynthetic fun onSuccess(onSuccess : (RESULT) -> Unit) = apply { this.onSuccess.add(onSuccess) }
+    fun onSuccess(onSuccess : Consumer<RESULT>) = apply { this.onSuccess.add { onSuccess.accept(it) } }
+    fun onSuccess(onSuccess : Procedure) = apply { this.onSuccess.add { onSuccess.call() } }
 
-    @Volatile private var onError : ((Throwable) -> Unit)? = null
-    @JvmSynthetic fun onError(onError : (Throwable) -> Unit) = also { this.onError = onError }
-    fun onError(onError : Consumer<Throwable>) = also { this.onError = { onError.accept(it) } }
+    private val onError : Queue<(Throwable) -> Unit> = LinkedList()
+    @JvmSynthetic fun onError(onError : (Throwable) -> Unit) = apply { this.onError.add(onError) }
+    fun onError(onError : Consumer<Throwable>) = apply { this.onError.add { onError.accept(it) } }
 
-    @Volatile private var onAny : (() -> Unit)? = null
-    @JvmSynthetic fun onAny(onAny : () -> Unit) = also { this.onAny = onAny }
-    fun onAny(onAny : Procedure) = also { this.onAny = { onAny.call() } }
+    private val onAny : Queue<() -> Unit> = LinkedList()
+    @JvmSynthetic fun onAny(onAny : () -> Unit) = apply { this.onAny.add(onAny) }
+    fun onAny(onAny : Procedure) = apply { this.onAny.add { onAny.call() } }
+
+    private fun Queue<() -> Unit>.invoke() { while(!isEmpty()) remove().invoke() }
+    private fun <T> Queue<(T) -> Unit>.invoke(arg : T) { while(!isEmpty()) remove().invoke(arg) }
 
     init
     {
         FutureThreadPoolExecutors.DEFAULT.execute {
             try
             {
+                FutureDefaults.beforeAnyFuture?.let { before ->
+                    UIThreadRunner.runOnUIThread(before)
+                }
+
+                FutureDefaults.afterAnyFuture?.let(::onAny)
+
                 val startTimestampInMills = System.currentTimeMillis()
-                val result = supplier.get()
+                val result = resultSupplier.get()
                 val stopTimestampInMills = System.currentTimeMillis()
 
                 //hack: avoid race conditions
@@ -47,38 +57,41 @@ class Future<RESULT>(supplier : Supplier<RESULT>)
         }
     }
 
-    fun withCancellationToken(cancellationToken : CancellationToken) : Future<RESULT>
-    {
-        cancellationToken.addCancellationListener {
-            this.onSuccess = null
-            this.onError = null
-            this.onAny = null
-        }
+    fun withLifecycleOwner(lifecycleOwner : LifecycleOwner) : Future<RESULT> = apply {
+        lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
+                if (event==Lifecycle.Event.ON_DESTROY) {
+                    onAny.clear()
+                    onError.clear()
+                    onSuccess.clear()
+                }
+            }
+        })
+    }
 
-        return this
+    fun withCancellationToken(cancellationToken : CancellationToken) : Future<RESULT> = apply {
+        cancellationToken.addCancellationListener {
+            this.onSuccess.clear()
+            this.onError.clear()
+            this.onAny.clear()
+        }
     }
 
     private fun callOnSuccess(result : RESULT)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.invoke()
-            onSuccess?.invoke(result)
-
-            onAny = null
-            onSuccess = null
-            onError = null
+            onAny.invoke()
+            onSuccess.invoke(result)
+            onError.clear()
         }
     }
 
     private fun callOnError(ex : Throwable)
     {
         UIThreadRunner.runOnUIThread {
-            onAny?.invoke()
-            onError?.invoke(ex)
-
-            onAny = null
-            onSuccess = null
-            onError = null
+            onAny.invoke()
+            onError.invoke(ex)
+            onSuccess.clear()
         }
     }
 }
