@@ -31,12 +31,6 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
         FutureThreadPoolExecutors.DEFAULT.execute {
             try
             {
-                FutureDefaults.beforeAnyFuture?.let { before ->
-                    UIThreadRunner.runOnUIThread(before)
-                }
-
-                FutureDefaults.afterAnyFuture?.let(::onAny)
-
                 val startTimestampInMills = System.currentTimeMillis()
                 val result = resultSupplier.get()
                 val stopTimestampInMills = System.currentTimeMillis()
@@ -69,11 +63,25 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
         })
     }
 
-    fun withCancellationToken(cancellationToken : CancellationToken) : Future<RESULT> = apply {
-        cancellationToken.addCancellationListener {
-            this.onSuccess.clear()
-            this.onError.clear()
-            this.onAny.clear()
+    fun <LIFECYCLE_OWNER : LifecycleOwner> withLifecycleOwner(loadingViewHandler : LoadingViewHandler<LIFECYCLE_OWNER>) = apply {
+
+        UIThreadRunner.runOnUIThread { loadingViewHandler.showLoadingView.accept(loadingViewHandler.lifecycleOwner) }
+        onAny.add { loadingViewHandler.hideLoadingView.accept(loadingViewHandler.lifecycleOwner) }
+
+        loadingViewHandler.lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
+                if (event==Lifecycle.Event.ON_DESTROY) {
+                    onAny.clear()
+                    onError.clear()
+                    onSuccess.clear()
+                }
+            }
+        })
+
+        loadingViewHandler.cancellationToken?.addCancellationListener {
+            onAny.clear()
+            onError.clear()
+            onSuccess.clear()
         }
     }
 
