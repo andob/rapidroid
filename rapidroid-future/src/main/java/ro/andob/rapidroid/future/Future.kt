@@ -52,7 +52,7 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
     }
 
     fun withLifecycleOwner(lifecycleOwner : LifecycleOwner) : Future<RESULT> = apply {
-        if (lifecycleOwner is LoadingViewHandler<*>)
+        if (lifecycleOwner is LoadingViewHandler)
         {
             withLoadingViewHandler(lifecycleOwner)
         }
@@ -70,10 +70,10 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
         }
     }
 
-    fun <LIFECYCLE_OWNER : LifecycleOwner> withLoadingViewHandler(loadingViewHandler : LoadingViewHandler<LIFECYCLE_OWNER>) = apply {
+    fun withLoadingViewHandler(loadingViewHandler : LoadingViewHandler) = apply {
 
-        UIThreadRunner.runOnUIThread { loadingViewHandler.showLoadingView.accept(loadingViewHandler.lifecycleOwner) }
-        onAny.add { loadingViewHandler.hideLoadingView.accept(loadingViewHandler.lifecycleOwner) }
+        UIThreadRunner.runOnUIThread { loadingViewHandler.showLoadingView.call() }
+        onAny.add { loadingViewHandler.hideLoadingView.call() }
 
         loadingViewHandler.cancellationToken?.addCancellationListener {
             onAny.clear()

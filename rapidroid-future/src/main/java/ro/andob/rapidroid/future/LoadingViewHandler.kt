@@ -4,12 +4,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Consumer
+import ro.andob.rapidroid.Procedure
 
-class LoadingViewHandler<LIFECYCLE_OWNER : LifecycleOwner>
+class LoadingViewHandler
 (
-    val lifecycleOwner : LIFECYCLE_OWNER,
-    val showLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {},
-    val hideLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {},
+    val lifecycleOwner : LifecycleOwner,
+    val showLoadingView : Procedure = Procedure {},
+    val hideLoadingView : Procedure = Procedure {},
     val cancellationToken : CancellationToken? = null,
 ) : LifecycleOwner
 {
@@ -17,11 +18,15 @@ class LoadingViewHandler<LIFECYCLE_OWNER : LifecycleOwner>
 
     class Builder<LIFECYCLE_OWNER : LifecycleOwner>(private val lifecycleOwner : LIFECYCLE_OWNER)
     {
-        private var showLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {}
-        fun withShowLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply { showLoadingView=lambda }
+        private var showLoadingView : Procedure = Procedure {}
+        fun withShowLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply {
+            showLoadingView=Procedure { lambda.accept(lifecycleOwner) }
+        }
 
-        private var hideLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {}
-        fun withHideLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply { hideLoadingView=lambda }
+        private var hideLoadingView : Procedure = Procedure {}
+        fun withHideLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply {
+            hideLoadingView=Procedure { lambda.accept(lifecycleOwner) }
+        }
 
         private var cancellationToken : CancellationToken? = null
         fun withLoadingViewCancellationToken(token : CancellationToken) = apply { cancellationToken=token }
