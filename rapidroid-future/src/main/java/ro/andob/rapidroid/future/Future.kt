@@ -52,18 +52,22 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
     }
 
     fun withLifecycleOwner(lifecycleOwner : LifecycleOwner) : Future<RESULT> = apply {
-        lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
-                if (event==Lifecycle.Event.ON_DESTROY) {
-                    onAny.clear()
-                    onError.clear()
-                    onSuccess.clear()
-                }
-            }
-        })
-
         if (lifecycleOwner is LoadingViewHandler<*>)
+        {
             withLoadingViewHandler(lifecycleOwner)
+        }
+        else
+        {
+            lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+                override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
+                    if (event==Lifecycle.Event.ON_DESTROY) {
+                        onAny.clear()
+                        onError.clear()
+                        onSuccess.clear()
+                    }
+                }
+            })
+        }
     }
 
     fun <LIFECYCLE_OWNER : LifecycleOwner> withLoadingViewHandler(loadingViewHandler : LoadingViewHandler<LIFECYCLE_OWNER>) = apply {
@@ -76,6 +80,16 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
             onError.clear()
             onSuccess.clear()
         }
+
+        loadingViewHandler.lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
+                if (event==Lifecycle.Event.ON_DESTROY) {
+                    onAny.clear()
+                    onError.clear()
+                    onSuccess.clear()
+                }
+            }
+        })
     }
 
     private fun callOnSuccess(result : RESULT)
