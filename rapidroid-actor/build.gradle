@@ -43,7 +43,7 @@ project.afterEvaluate {
             maven(MavenPublication) {
                 groupId 'ro.andob.rapidroid'
                 artifactId 'rapidroid-actor'
-                version '1.2.7'
+                version '1.2.8'
                 artifact(bundleReleaseAar)
             }
         }

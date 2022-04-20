@@ -61,22 +61,15 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
                 }
             }
         })
+
+        if (lifecycleOwner is LoadingViewHandler<*>)
+            withLoadingViewHandler(lifecycleOwner)
     }
 
-    fun <LIFECYCLE_OWNER : LifecycleOwner> withLifecycleOwner(loadingViewHandler : LoadingViewHandler<LIFECYCLE_OWNER>) = apply {
+    fun <LIFECYCLE_OWNER : LifecycleOwner> withLoadingViewHandler(loadingViewHandler : LoadingViewHandler<LIFECYCLE_OWNER>) = apply {
 
         UIThreadRunner.runOnUIThread { loadingViewHandler.showLoadingView.accept(loadingViewHandler.lifecycleOwner) }
         onAny.add { loadingViewHandler.hideLoadingView.accept(loadingViewHandler.lifecycleOwner) }
-
-        loadingViewHandler.lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
-                if (event==Lifecycle.Event.ON_DESTROY) {
-                    onAny.clear()
-                    onError.clear()
-                    onSuccess.clear()
-                }
-            }
-        })
 
         loadingViewHandler.cancellationToken?.addCancellationListener {
             onAny.clear()

@@ -1,5 +1,6 @@
 package ro.andob.rapidroid.future
 
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import ro.andob.rapidroid.CancellationToken
 import ro.andob.rapidroid.Consumer
@@ -10,8 +11,10 @@ class LoadingViewHandler<LIFECYCLE_OWNER : LifecycleOwner>
     val showLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {},
     val hideLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {},
     val cancellationToken : CancellationToken? = null,
-)
+) : LifecycleOwner
 {
+    override fun getLifecycle() : Lifecycle = lifecycleOwner.lifecycle
+
     class Builder<LIFECYCLE_OWNER : LifecycleOwner>(private val lifecycleOwner : LIFECYCLE_OWNER)
     {
         private var showLoadingView : Consumer<LIFECYCLE_OWNER> = Consumer {}
