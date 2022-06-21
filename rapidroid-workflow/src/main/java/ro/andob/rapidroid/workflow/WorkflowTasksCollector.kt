@@ -12,16 +12,20 @@ class WorkflowTasksCollector
         tasks.add(task)
     }
 
-    internal fun toSequentialRunner() =
-        SequentialRunnerFactory.newSequentialRunner(
-            workflowContext = workflowContext,
-            tasks = tasks)
+    internal fun toSequentialRunner() : () -> Unit
+    {
+        return SequentialRunnerFactory.newSequentialRunner(
+                workflowContext = workflowContext,
+                tasks = tasks)
+    }
 
-    internal fun toParallelRunner(numberOfThreads : Int) =
-        ParallelRunnerFactory.newParallelRunner(
-            workflowContext = workflowContext,
-            numberOfThreads = numberOfThreads,
-            tasks = tasks)
+    internal fun toParallelRunner(numberOfThreads : Int) : () -> Unit
+    {
+        return ParallelRunnerFactory.newParallelRunner(
+                workflowContext = workflowContext,
+                numberOfThreads = numberOfThreads,
+                tasks = tasks)
+    }
 
     fun sequential
     (
