@@ -39,7 +39,7 @@ object ThreadRunner
 
     fun runIfNotAlreadyRunning(procedure : Procedure, threadIsRunningFlag : ThreadIsRunningFlag) : Thread?
     {
-        if (!threadIsRunningFlag.get())
+        if (threadIsRunningFlag.compareAndSet(expectedValue = false, newValue = true))
             return run(procedure, threadIsRunningFlag)
         return null
     }

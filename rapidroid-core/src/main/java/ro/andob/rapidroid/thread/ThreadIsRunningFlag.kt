@@ -8,6 +8,9 @@ class ThreadIsRunningFlag
 
     fun get() = isRunning.get()
 
+    internal fun compareAndSet(expectedValue : Boolean, newValue : Boolean) =
+        isRunning.compareAndSet(expectedValue, newValue)
+
     internal fun set(isRunning : Boolean)
     {
         this.isRunning.set(isRunning)
