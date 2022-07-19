@@ -50,12 +50,14 @@ class WorkflowTasksCollector
 
     fun <T> parallelList
     (
-        itemsProvider : () -> (List<T>),
-        itemSubtask : (T) -> (Unit),
+        itemsProvider : () -> List<T>,
+        itemSubtask : (T) -> Unit,
+        preconditions : (() -> Unit)? = null,
         numberOfThreads : Int = WorkflowContext.DEFAULT_NUMBER_OF_THREADS,
     )
     {
         tasks.add {
+            preconditions?.invoke()
             val items = itemsProvider()
             if (items.isNotEmpty())
             {
