@@ -1,6 +1,7 @@
 package ro.andob.rapidroid.actor
 
 import ro.andob.rapidroid.Procedure
+import ro.andob.rapidroid.Rapidroid
 import ro.andob.rapidroid.thread.ThreadIsRunningFlag
 import ro.andob.rapidroid.thread.ThreadRunner
 import java.util.concurrent.LinkedBlockingQueue
@@ -13,14 +14,17 @@ abstract class Actor<EVENT>
 
     private val eventQueue = LinkedBlockingQueue<EVENT>(Int.MAX_VALUE)
 
+    private inline fun loopForever(block : () -> Unit) { while(true) block() }
+
     fun enqueueEvent(event : EVENT)
     {
         eventQueue.add(event)
         phaser.register()
 
         val eventQueueConsumer = Procedure {
-            while(true) {
+            loopForever {
                 try { handleEvent(eventQueue.take()!!) }
+                catch (ex : Throwable) { Rapidroid.exceptionLogger.log(ex) }
                 finally { phaser.arriveAndDeregister() }
             }
         }
