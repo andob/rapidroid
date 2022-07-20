@@ -44,12 +44,17 @@ abstract class Actor<EVENT>
 
     fun awaitCompletionAndThen(lambda : () -> Unit)
     {
-        phaser.arriveAndAwaitAdvance()
-
         pause()
 
-        try { lambda() }
-        finally { resume() }
+        try
+        {
+            phaser.arriveAndAwaitAdvance()
+            lambda()
+        }
+        finally
+        {
+            resume()
+        }
     }
 
     fun pause() = isPaused.set(true)
