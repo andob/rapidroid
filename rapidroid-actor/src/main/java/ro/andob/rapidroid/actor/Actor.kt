@@ -42,14 +42,14 @@ abstract class Actor<EVENT>
         phaser.arriveAndAwaitAdvance()
     }
 
-    fun awaitCompletionAndThen(lambda : () -> Unit)
+    fun awaitCompletionAndThen(lambda : Procedure)
     {
         pause()
 
         try
         {
             phaser.arriveAndAwaitAdvance()
-            lambda()
+            lambda.call()
         }
         finally
         {
