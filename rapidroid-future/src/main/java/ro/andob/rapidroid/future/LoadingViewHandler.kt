@@ -20,16 +20,16 @@ class LoadingViewHandler
     {
         private var showLoadingView : Procedure = Procedure {}
         fun withShowLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply {
-            showLoadingView=Procedure { lambda.accept(lifecycleOwner) }
+            showLoadingView = Procedure { lambda.accept(lifecycleOwner) }
         }
 
         private var hideLoadingView : Procedure = Procedure {}
         fun withHideLoadingViewFunction(lambda : Consumer<LIFECYCLE_OWNER>) = apply {
-            hideLoadingView=Procedure { lambda.accept(lifecycleOwner) }
+            hideLoadingView = Procedure { lambda.accept(lifecycleOwner) }
         }
 
         private var cancellationToken : CancellationToken? = null
-        fun withLoadingViewCancellationToken(token : CancellationToken) = apply { cancellationToken=token }
+        fun withLoadingViewCancellationToken(token : CancellationToken) = apply { cancellationToken = token }
 
         fun build() = LoadingViewHandler(lifecycleOwner, showLoadingView, hideLoadingView, cancellationToken)
     }

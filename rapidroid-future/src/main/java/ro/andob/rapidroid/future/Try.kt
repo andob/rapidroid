@@ -31,7 +31,7 @@ fun <T> _try(lambda : Supplier<T>) =
     Supplier<T?> {
         try {
             return@Supplier lambda.get()
-        } catch (ex: Exception) {
+        } catch (ex : Exception) {
             Rapidroid.exceptionLogger.log(ex)
             return@Supplier null
         }

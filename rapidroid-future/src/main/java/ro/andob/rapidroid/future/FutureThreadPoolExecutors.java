@@ -11,7 +11,7 @@ public class FutureThreadPoolExecutors
 
     static
     {
-        DEFAULT=new ThreadPoolExecutor(4, 4, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>(Integer.MAX_VALUE));
+        DEFAULT = new ThreadPoolExecutor(4, 4, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>(Integer.MAX_VALUE));
         DEFAULT.setRejectedExecutionHandler(((runnable, executor) -> ThreadRunner.run(runnable::run)));
         DEFAULT.allowCoreThreadTimeOut(true);
     }

@@ -13,7 +13,7 @@ class WorkflowErrorNotifier
 
     fun throwOnError()
     {
-        val error=errorHolder.get()
+        val error = errorHolder.get()
         if (error!=null)
             throw error
     }

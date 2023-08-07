@@ -35,7 +35,7 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
                 val result = resultSupplier.get()
                 val stopTimestampInMills = System.currentTimeMillis()
 
-                //hack: avoid race conditions
+                //hack : avoid race conditions
                 val minThreadExecutionTime = 10L
                 if (stopTimestampInMills-startTimestampInMills<=minThreadExecutionTime)
                     Thread.sleep(minThreadExecutionTime)
