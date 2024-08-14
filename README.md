@@ -20,120 +20,218 @@ dependencies {
 }
 ```
 
-#### Core
+#### Threads
 
-To run a thread (example with the Java API):
+To start a thread:
 
-```java
-Run.thread(() -> System.out.println("Hello!"));
+```kotlin
+Run.thread { doSomething() }
 ```
 
-To run a thread only once (example with Kotlin API):
+To start and join a thread:
 
-```java
-object SyncService
-{
-    private val isRunning = ThreadIsRunningFlag()
-    fun isRunning() = isRunning.get()
-
-    fun start()
-    {
-        Run.threadIfNotAlreadyRunning(
-            threadIsRunningFlag = isRunning,
-            task = { println("do something") })
-    }
-}
+```kotlin
+val thread = Run.thread { doSomething() }
+thread.join()
 ```
 
 #### Futures
 
-A future is simply a task that does something / returns something on a background thread, then calls onSuccess/onError/onAny on the UI thread. Java API:
-
-```java
-Run.async(() ->
-{
-    System.out.println("Hello!");
-    return 4;
-})
-.onAny(() -> System.out.println("Any was called!"))
-.onError(ex -> System.out.println("Error!"))
-.onSuccess(x -> System.out.println("Success! "+x));
-```
-
-Kotlin API:
+A future is simply a thread that returns something, then calls onSuccess / onError / onAny callbacks on the UI thread:
 
 ```kotlin
-Run.async { 4 }
-   .onAny { println("Any was called!") }
-   .onError { ex -> println("Error!") }
-   .onSuccess { x -> println("Success! "+x) }
+fun calculateTheMeaningOfLife() : Int
+{
+    println("Complicated computation...")
+    return 42
+}
+
+fun calculateTheMeaningOfLifeAsync() : Future<Int>
+{
+    return Run.async { calculateTheMeaningOfLife() }
+}
+```
+
+```kotlin
+calculateTheMeaningOfLifeAsync()
+    .onSuccess { result -> view.showMeaningOfLife(result) }
+    .onError { exception -> view.showError(exception) }
+```
+
+Of course this could be chained:
+
+```kotlin
+view.showLoadingAnimation()
+Run.async { calculateTheMeaningOfLife() }
+    .onAny { view.hideLoadingAnimation() }
+    .onError { ex -> view.showError(ex) }
+    .onSuccess { result -> view.showMeaningOfLife(result) }
+```
+
+Loading animation boilerplate could be abstracted as follows:
+
+```kotlin
+abstract class BaseActivity : AppCompatActivity()
+{
+    fun getLoadingViewHandler() : LoadingViewHandler
+    {
+        return LoadingViewHandler(lifecycleOwner = this,
+            showLoadingView = { /*show loading animation...*/ },
+            hideLoadingView = { /*hide loading animation...*/ })
+    }
+}
+```
+
+```kotlin
+fun calculate(view : MeaningOfLifeActivity)
+{
+    Run.async { calculateTheMeaningOfLife() }
+        .withLoadingViewHandler(view.getLoadingViewHandler())
+        .onSuccess { result -> view.showMeaningOfLife(result) }
+        .onError { ex -> view.showError(ex) }
+}
 ```
 
 #### Workflows
 
-The workflow API lets you easily define and change how concurrent tasks gets executed. Based on the concept of composable lambdas (similar to Jetpack Compose), one can easily compose sequential / parallel / task blocks to describe the execution. Available only as a Kotlin API.
+A workflow is a asynchronous task orchestrator. The workflow DSL API easily lets you define and change how such tasks gets executed. For instance, this will execute two tasks sequentially:
 
 ```kotlin
-object SyncService
-{
-    private val isRunning = ThreadIsRunningFlag()
-    fun isRunning() = isRunning.get()
-
-    fun start()
-    {
-        Run.threadIfNotAlreadyRunning(
-            threadIsRunningFlag = isRunning,
-            task = {
-                Run.workflow {
-                    sequential {
-                        task { println("1") }
-                        parallel {
-                            task { println("2") }
-                            task { println("3") }
-                            task { println("4") }
-                        }
-                        task { println("5") }
-                    }
-                }
-            })
+Run.workflow {
+    sequential { 
+        task { doSomething() }
+        task { doAnotherThing() }
     }
 }
 ```
+
+To run tasks in parallel:
+
+```kotlin
+Run.workflow {
+    parallel {
+        task { doSomething() }
+        task { doAnotherThing() }
+    }
+}
+```
+
+Parallel execution is limited by a given number of threads at any moment in time. The default value is 4 threads. That is, at any moment in time, only 4 tasks will run in parallel, the rest will be queued and will get executed when currently running tasks finish their execution. You can change this limit by passing the ``numberOfThreads`` argument. For instance, this will print 1, 2, then after 100 milliseconds 3, 4:
+
+```kotlin
+Run.workflow {
+    parallel(numberOfThreads = 2) {
+        task { println(1); Thread.sleep(100) }
+        task { println(2); Thread.sleep(100) }
+        task { println(3) }
+        task { println(4) }
+    }
+}
+```
+
+``sequential {}`` and ``parallel {}`` blocks can be composed as much as you like. By composing, you will easily be able to describe the execution of tasks. For instance:
+
+```kotlin
+Run.thread {
+    Run.workflow {
+        sequential {
+            task { f1() }
+            parallel {
+                task { f2() }
+                task { f3() }
+                task { f4() }
+            }
+            task { f5() }
+        }
+    }
+}
+```
+
+Will execute as follows:
 
 ![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/docs/workflow.png)
 
-NOTE: the code inside the ``task {}`` block must run synchronously / blocking. Do NOT create new threads inside ``task {}``, but if you do, please join them into the parent thread. For instance, if you're using RxJava or other concurrency framework, you must call ``blockingGet()`` or similar.
+Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.async`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
 
-NOTE: The workflow spawns threads and then joins them into the parent thread. This means that, by calling ``Run.workflow``, you will block the current running thread. Do not call ``Run.workflow`` on UI thread. Wrap it inside a thread, like this: ``Run.thread { Run.workflow {} }``
+Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.async {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Rather, use the ``execute`` as it is a blocking API:
 
-NOTE: The parallel block does not run tasks as in "one thread per tasks". It runs tasks inside an executor, which limits the maximum number of tasks that run at a moment in time.
+```kotlin
+interface APIClient
+{
+    @GET("/getItems")
+    fun getItems() : Call<List<Item>>
+}
+```
+
+```kotlin
+Run.async { apiClient.getItems().execute().body()!! }
+    .onSuccess { items -> view.showItems(items) }
+```
 
 #### Actors
 
-Single-threaded actor model / event queue implementation. Using an actor, you can process events sequentially from an event queue. Actors must be singleton objects - there must be only one object instance per actor class. Example with the Kotlin API:
+This implements a single-threaded actor model. By using an actor, you can process events sequentially. Actors must be singleton objects (there must be only one actor instance). Internally, an actor will run a background thread that will sequentially pop and process an internal queue.
 
-```java
-class ShowMessageEvent(val message : String)
+```kotlin
+class OnItemReadyEvent(val item : Item)
 ```
 
-```java
-object ShowMessageActor : Actor<ShowMessageEvent>
+```kotlin
+object ProcessItemsActor : Actor<OnItemReadyEvent>()
 {
-    override fun handleEvent(event : ShowMessageEvent)
+    override fun handleEvent(event : OnItemReadyEvent)
     {
-        println(event.message)
+        doSomethingWith(event.item)
     }
 }
 ```
 
-```java
-ShowMessageActor.enqueueEvent(ShowMessageEvent("Hello"))
+```kotlin
+ProcessItemsActor.enqueueEvent(OnItemReadyEvent(item))
+```
+
+#### Global exception logger
+
+You can attach a global exception logger. This will be called on any exception encountered by any of the library APIs.
+
+```kotlin
+Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> log(ex) }
+```
+
+This is particularly useful in order to log exception from any application thread, whatever it may be. Take a look at this simple yet powerful logger:
+
+```kotlin
+class App : Application()
+{
+    override fun onCreate()
+    {
+        super.onCreate()
+
+        //log any exception on the UI thread (any application crash)
+        Thread.setDefaultUncaughtExceptionHandler { _, ex -> ExceptionLogger.log(ex) }
+
+        //log other exceptions from any other threads
+        Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> ExceptionLogger.log(ex) }
+    }
+}
+
+object ExceptionLogger
+{
+    fun log(ex : Throwable)
+    {
+        Run.thread {
+            //we will log all errors on the backend. logging every error from every user!
+            try { ApiClient.Instance.logException(ex).execute() }
+            catch (ignored : Throwable) {} //prevent recalling log()
+        }
+    }
+}
 ```
 
 #### License
 
 ```
-Copyright 2020-2022 Andrei Dobrescu
+Copyright 2020-2024 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
