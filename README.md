@@ -2,7 +2,7 @@
 
 Some concurrency design patterns I use in my Android projects.
 
-#### Import
+### Import
 
 ```
 repositories {
@@ -20,7 +20,7 @@ dependencies {
 }
 ```
 
-#### Threads
+### Threads
 
 To start a thread:
 
@@ -35,9 +35,9 @@ val thread = Run.thread { doSomething() }
 thread.join()
 ```
 
-#### Futures
+### Futures
 
-A future is simply a thread that returns something, then calls onSuccess / onError / onAny callbacks on the UI thread:
+A future is simply a thread that returns something, then calls onSuccess/onError/onAny callbacks on the UI thread:
 
 ```kotlin
 fun calculateTheMeaningOfLife() : Int
@@ -62,6 +62,7 @@ Of course this could be chained:
 
 ```kotlin
 view.showLoadingAnimation()
+
 Run.async { calculateTheMeaningOfLife() }
     .onAny { view.hideLoadingAnimation() }
     .onError { ex -> view.showError(ex) }
@@ -92,7 +93,7 @@ fun calculate(view : MeaningOfLifeActivity)
 }
 ```
 
-#### Workflows
+### Workflows
 
 A workflow is a asynchronous task orchestrator. The workflow DSL API easily lets you define and change how such tasks gets executed. For instance, this will execute two tasks sequentially:
 
@@ -153,7 +154,7 @@ Will execute as follows:
 
 Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.async`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
 
-Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.async {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Rather, use the ``execute`` as it is a blocking API:
+Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.async {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Use the ``execute`` as it is a blocking API:
 
 ```kotlin
 interface APIClient
@@ -168,7 +169,7 @@ Run.async { apiClient.getItems().execute().body()!! }
     .onSuccess { items -> view.showItems(items) }
 ```
 
-#### Actors
+### Actors
 
 This implements a single-threaded actor model. By using an actor, you can process events sequentially. Actors must be singleton objects (there must be only one actor instance). Internally, an actor will run a background thread that will sequentially pop and process an internal queue.
 
@@ -190,9 +191,9 @@ object ProcessItemsActor : Actor<OnItemReadyEvent>()
 ProcessItemsActor.enqueueEvent(OnItemReadyEvent(item))
 ```
 
-#### Global exception logger
+### Global exception logger
 
-You can attach a global exception logger. This will be called on any exception encountered by any of the library APIs.
+You can attach a global exception logger. This will be called on any exception detected by any of the library APIs. That is, will log every exception your code (wrapped inside ``task {}``, ``async {}``, ``thread {}`` or similar) throws!
 
 ```kotlin
 Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> log(ex) }
@@ -228,7 +229,7 @@ object ExceptionLogger
 }
 ```
 
-#### License
+### License
 
 ```
 Copyright 2020-2024 Andrei Dobrescu
