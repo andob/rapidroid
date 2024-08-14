@@ -37,7 +37,7 @@ thread.join()
 
 ### Futures
 
-A future is simply a thread that returns something, then calls onSuccess/onError/onAny callbacks on the UI thread:
+A future is simply a thread that returns something, then calls onSuccess/onError/onAny on the UI thread:
 
 ```kotlin
 fun calculateTheMeaningOfLife() : Int
@@ -193,7 +193,7 @@ ProcessItemsActor.enqueueEvent(OnItemReadyEvent(item))
 
 ### Global exception logger
 
-You can attach a global exception logger. This will be called on any exception detected by any of the library APIs. That is, will log every exception your code (wrapped inside ``task {}``, ``async {}``, ``thread {}`` or similar) throws!
+You can attach a global exception logger. This will be called on any exception detected by any of the library APIs. That is, will log every exception in code (wrapped inside ``task {}``, ``async {}``, ``thread {}`` or similar)!
 
 ```kotlin
 Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> log(ex) }
