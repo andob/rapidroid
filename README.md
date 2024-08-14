@@ -193,7 +193,7 @@ ProcessItemsActor.enqueueEvent(OnItemReadyEvent(item))
 
 ### Global exception logger
 
-You can attach a global exception logger. This will be called on any exception detected by any of the library APIs. That is, will log every exception in code (wrapped inside ``task {}``, ``async {}``, ``thread {}`` or similar)!
+You can attach a global exception logger. This will be called on any exception detected by any of the library APIs. That is, will log every exception your code would ever throw (that is, as long as your code is wrapped inside ``task {}``, ``async {}``, ``thread {}`` or similar)!
 
 ```kotlin
 Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> log(ex) }
