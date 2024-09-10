@@ -14,7 +14,7 @@ class LoadingViewHandler
     val cancellationToken : CancellationToken? = null,
 ) : LifecycleOwner
 {
-    override fun getLifecycle() : Lifecycle = lifecycleOwner.lifecycle
+    override val lifecycle : Lifecycle get() = lifecycleOwner.lifecycle
 
     class Builder<LIFECYCLE_OWNER : LifecycleOwner>(private val lifecycleOwner : LIFECYCLE_OWNER)
     {

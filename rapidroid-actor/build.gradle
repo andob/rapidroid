@@ -3,10 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdk 33
+    namespace 'ro.andob.rapidroid.actor'
+    compileSdk 34
     defaultConfig {
         minSdk 21
-        targetSdk 33
+        targetSdk 34
     }
 
     compileOptions {
