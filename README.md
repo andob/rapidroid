@@ -150,7 +150,7 @@ Run.thread {
 
 Will execute as follows:
 
-![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/docs/workflow.png)
+![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/workflow.png)
 
 Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.async`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
 
