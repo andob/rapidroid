@@ -3,11 +3,11 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace 'ro.industrialaccess.rapidroid.sample'
-    compileSdk 34
+    compileSdk 35
     defaultConfig {
         applicationId 'ro.industrialaccess.rapidroid.sample'
         minSdk 21
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName '1.0'
     }
