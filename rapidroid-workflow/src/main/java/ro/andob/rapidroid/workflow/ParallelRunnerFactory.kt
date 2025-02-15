@@ -15,7 +15,7 @@ object ParallelRunnerFactory
             if (tasks.isEmpty())
                 return@lambda
 
-            if (tasks.size==1)
+            if (tasks.size == 1)
                 return@lambda tasks[0]()
 
             groupTasks(workflowContext, numberOfThreads, tasks)

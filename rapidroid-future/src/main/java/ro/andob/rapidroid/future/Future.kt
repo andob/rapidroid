@@ -37,7 +37,7 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
 
                 //hack : avoid race conditions
                 val minThreadExecutionTime = 10L
-                if (stopTimestampInMills-startTimestampInMills<=minThreadExecutionTime)
+                if (stopTimestampInMills-startTimestampInMills <= minThreadExecutionTime)
                     Thread.sleep(minThreadExecutionTime)
 
                 callOnSuccess(result)
@@ -60,7 +60,7 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
         {
             lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
                 override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
-                    if (event==Lifecycle.Event.ON_DESTROY) {
+                    if (event == Lifecycle.Event.ON_DESTROY) {
                         onAny.clear()
                         onError.clear()
                         onSuccess.clear()
@@ -83,7 +83,7 @@ class Future<RESULT>(resultSupplier : Supplier<RESULT>)
 
         loadingViewHandler.lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source : LifecycleOwner, event : Lifecycle.Event) {
-                if (event==Lifecycle.Event.ON_DESTROY) {
+                if (event == Lifecycle.Event.ON_DESTROY) {
                     onAny.clear()
                     onError.clear()
                     onSuccess.clear()
