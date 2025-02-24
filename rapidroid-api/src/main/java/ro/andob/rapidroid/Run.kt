@@ -10,59 +10,67 @@ import ro.andob.rapidroid.workflow.WorkflowContext
 object Run
 {
     /*
-     * Threads
+     * Threads Kotlin API
      */
-
-    @JvmStatic
-    fun thread(procedure : Procedure) : Thread =
-        ThreadRunner.run(procedure)
 
     @JvmStatic @JvmSynthetic
     fun thread(procedure : () -> Unit) : Thread =
         ThreadRunner.run(procedure)
 
-    @JvmStatic
-    fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread =
-        ThreadRunner.run(procedure, threadIsRunningFlag)
-
     @JvmStatic @JvmSynthetic
     fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : () -> Unit) : Thread =
         ThreadRunner.run(procedure, threadIsRunningFlag)
 
-    @JvmStatic
-    fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread? =
-        ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
-
     @JvmStatic @JvmSynthetic
     fun threadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : () -> Unit) : Thread? =
         ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
-
-    @JvmStatic
-    fun onUiThread(procedure : Procedure) =
-        UIThreadRunner.runOnUIThread(procedure)
 
     @JvmStatic @JvmSynthetic
     fun onUiThread(procedure : () -> Unit) =
         UIThreadRunner.runOnUIThread(procedure)
 
     /*
-     * Futures
+     * Threads Java API
      */
 
-    @JvmStatic
-    fun async(procedure : Procedure) : Future<Unit> =
-        Future { procedure.call() }
+    @JvmStatic @JvmName("thread")
+    fun javaAPIThread(procedure : Procedure) : Thread =
+        ThreadRunner.run(procedure)
 
-    @JvmStatic
-    fun <T> async(supplier : Supplier<T>) : Future<T> =
-        Future(supplier)
+    @JvmStatic @JvmName("thread")
+    fun javaAPIThread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread =
+        ThreadRunner.run(procedure, threadIsRunningFlag)
+
+    @JvmStatic @JvmName("threadIfNotAlreadyRunning")
+    fun javaAPIThreadIfNotAlreadyRunning(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread? =
+        ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
+
+    @JvmStatic @JvmName("onUiThread")
+    fun javaAPIOnUiThread(procedure : Procedure) =
+        UIThreadRunner.runOnUIThread(procedure)
+
+    /*
+     * Futures Kotlin API
+     */
 
     @JvmStatic @JvmSynthetic
     fun <T> async(supplier : () -> T) : Future<T> =
         Future(supplier)
 
     /*
-     * Workflow
+     * Futures Java API
+     */
+
+    @JvmStatic @JvmName("async")
+    fun javaAPIAsync(procedure : Procedure) : Future<Unit> =
+        Future { procedure.call() }
+
+    @JvmStatic @JvmName("async")
+    fun <T> javaAPIAsync(supplier : Supplier<T>) : Future<T> =
+        Future(supplier)
+
+    /*
+     * Workflow Kotlin API
      */
 
     @JvmStatic @JvmSynthetic
@@ -70,7 +78,7 @@ object Run
         dslBlock.invoke(WorkflowContext())
 
     /*
-     * Actor
+     * Actor Java+Kotlin API
      */
 
     @JvmStatic
