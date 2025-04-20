@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity()
 
     private fun onGetDataFromAPIButtonClicked()
     {
-        Run.async { ApiClient.Instance.getData().execute().body()!! }
+        Run.future { ApiClient.Instance.getData().execute().body()!! }
             .withLoadingViewHandler(getLoadingViewHandler())
             .onError { ex -> showToast(ex.message?:"") }
             .onSuccess { data -> showData(data) }
@@ -45,10 +45,10 @@ class MainActivity : AppCompatActivity()
 
     private fun onGetDataFromCacheButtonClicked()
     {
-        Run.async {
+        Run.future {
             val dataJson = getFileStreamPath(CACHE_FILE_NAME).readText()
             val dataType = object : TypeToken<List<Item>>() {}
-            return@async Gson().fromJson(dataJson, dataType)
+            return@future Gson().fromJson(dataJson, dataType)
         }
         .withLoadingViewHandler(getLoadingViewHandler())
         .onError { ex -> showToast(ex.message?:"") }

@@ -12,11 +12,11 @@ repositories {
 
 ```
 dependencies {
-    implementation 'ro.andob.rapidroid:rapidroid-api:1.3.9'
-    implementation 'ro.andob.rapidroid:rapidroid-core:1.3.9'
-    implementation 'ro.andob.rapidroid:rapidroid-futures:1.3.9'
-    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.3.9'
-    implementation 'ro.andob.rapidroid:rapidroid-actor:1.3.9'
+    implementation 'ro.andob.rapidroid:rapidroid-api:1.4.0'
+    implementation 'ro.andob.rapidroid:rapidroid-core:1.4.0'
+    implementation 'ro.andob.rapidroid:rapidroid-futures:1.4.0'
+    implementation 'ro.andob.rapidroid:rapidroid-workflow:1.4.0'
+    implementation 'ro.andob.rapidroid:rapidroid-actor:1.4.0'
 }
 ```
 
@@ -48,7 +48,7 @@ fun calculateTheMeaningOfLife() : Int
 
 fun calculateTheMeaningOfLifeAsync() : Future<Int>
 {
-    return Run.async { calculateTheMeaningOfLife() }
+    return Run.future { calculateTheMeaningOfLife() }
 }
 ```
 
@@ -63,7 +63,7 @@ Of course this could be chained:
 ```kotlin
 view.showLoadingAnimation()
 
-Run.async { calculateTheMeaningOfLife() }
+Run.future { calculateTheMeaningOfLife() }
     .onAny { view.hideLoadingAnimation() }
     .onError { ex -> view.showError(ex) }
     .onSuccess { result -> view.showMeaningOfLife(result) }
@@ -86,7 +86,7 @@ abstract class BaseActivity : AppCompatActivity()
 ```kotlin
 fun calculate(view : MeaningOfLifeActivity)
 {
-    Run.async { calculateTheMeaningOfLife() }
+    Run.future { calculateTheMeaningOfLife() }
         .withLoadingViewHandler(view.getLoadingViewHandler())
         .onSuccess { result -> view.showMeaningOfLife(result) }
         .onError { ex -> view.showError(ex) }
@@ -152,9 +152,9 @@ Will execute as follows:
 
 ![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/workflow.png)
 
-Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.async`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
+Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.future`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
 
-Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.async {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Use the ``execute`` as it is a blocking API:
+Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.future {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Use the ``execute`` as it is a blocking API:
 
 ```kotlin
 interface APIClient
@@ -165,7 +165,7 @@ interface APIClient
 ```
 
 ```kotlin
-Run.async { apiClient.getItems().execute().body()!! }
+Run.future { apiClient.getItems().execute().body()!! }
     .onSuccess { items -> view.showItems(items) }
 ```
 
@@ -232,7 +232,7 @@ object ExceptionLogger
 ### License
 
 ```
-Copyright 2020-2024 Andrei Dobrescu
+Copyright 2020-2025 Andrei Dobrescu
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

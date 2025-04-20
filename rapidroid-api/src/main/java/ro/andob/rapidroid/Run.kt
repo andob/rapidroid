@@ -14,8 +14,7 @@ object Run
      */
 
     @JvmStatic @JvmSynthetic
-    fun thread(procedure : () -> Unit) : Thread =
-        ThreadRunner.run(procedure)
+    fun thread(procedure : () -> Unit) : Thread = ThreadRunner.run(procedure)
 
     @JvmStatic @JvmSynthetic
     fun thread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : () -> Unit) : Thread =
@@ -26,16 +25,14 @@ object Run
         ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
 
     @JvmStatic @JvmSynthetic
-    fun onUiThread(procedure : () -> Unit) =
-        UIThreadRunner.runOnUIThread(procedure)
+    fun onUiThread(procedure : () -> Unit) = UIThreadRunner.runOnUIThread(procedure)
 
     /*
      * Threads Java API
      */
 
     @JvmStatic @JvmName("thread")
-    fun javaAPIThread(procedure : Procedure) : Thread =
-        ThreadRunner.run(procedure)
+    fun javaAPIThread(procedure : Procedure) : Thread = ThreadRunner.run(procedure)
 
     @JvmStatic @JvmName("thread")
     fun javaAPIThread(threadIsRunningFlag : ThreadIsRunningFlag, procedure : Procedure) : Thread =
@@ -46,42 +43,45 @@ object Run
         ThreadRunner.runIfNotAlreadyRunning(procedure, threadIsRunningFlag)
 
     @JvmStatic @JvmName("onUiThread")
-    fun javaAPIOnUiThread(procedure : Procedure) =
-        UIThreadRunner.runOnUIThread(procedure)
+    fun javaAPIOnUiThread(procedure : Procedure) = UIThreadRunner.runOnUIThread(procedure)
 
     /*
      * Futures Kotlin API
      */
 
     @JvmStatic @JvmSynthetic
-    fun <T> async(supplier : () -> T) : Future<T> =
-        Future(supplier)
+    fun <T> future(supplier : () -> T) : Future<T> = Future(supplier)
+
+    @JvmStatic @JvmSynthetic
+    fun <T> async(supplier : () -> T) : Future<T> = Future(supplier)
 
     /*
      * Futures Java API
      */
 
-    @JvmStatic @JvmName("async")
-    fun javaAPIAsync(procedure : Procedure) : Future<Unit> =
-        Future { procedure.call() }
+    @JvmStatic @JvmName("future")
+    fun javaAPIFuture(procedure : Procedure) : Future<Unit> = Future { procedure.call() }
+
+    @JvmStatic @JvmName("future")
+    fun <T> javaAPIFuture(supplier : Supplier<T>) : Future<T> = Future(supplier)
 
     @JvmStatic @JvmName("async")
-    fun <T> javaAPIAsync(supplier : Supplier<T>) : Future<T> =
-        Future(supplier)
+    fun javaAPIAsync(procedure : Procedure) : Future<Unit> = Future { procedure.call() }
+
+    @JvmStatic @JvmName("async")
+    fun <T> javaAPIAsync(supplier : Supplier<T>) : Future<T> = Future(supplier)
 
     /*
      * Workflow Kotlin API
      */
 
     @JvmStatic @JvmSynthetic
-    fun workflow(dslBlock : WorkflowContext.() -> (Unit)) =
-        dslBlock.invoke(WorkflowContext())
+    fun workflow(dslBlock : WorkflowContext.() -> (Unit)) = dslBlock.invoke(WorkflowContext())
 
     /*
      * Actor Java+Kotlin API
      */
 
     @JvmStatic
-    fun <EVENT> eventOnActor(actor : Actor<EVENT>, event : EVENT) =
-        actor.enqueueEvent(event)
+    fun <EVENT> eventOnActor(actor : Actor<EVENT>, event : EVENT) = actor.enqueueEvent(event)
 }
