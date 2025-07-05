@@ -1,6 +1,6 @@
 # rapidroid = rapid + android
 
-Some concurrency design patterns I use in my Android projects.
+Some structured concurrency design patterns I use in my Android projects.
 
 ### Import
 
@@ -37,7 +37,7 @@ thread.join()
 
 ### Futures (Promises)
 
-A future is simply a task which runs on a background thread pool, returns a result, then calls the onSuccess(result) callback or the onError(exception) callback.
+A future is simply a task which runs on a background thread pool, returns a result, then calls the onSuccess(result) callback or the onError(exception) callback on the UI thread.
 
 ```kotlin
 fun calculateTheMeaningOfLife() : Int
