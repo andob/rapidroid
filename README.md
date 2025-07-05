@@ -37,7 +37,7 @@ thread.join()
 
 ### Futures (Promises)
 
-A future is simply a task which runs on a background thread pool, returns a result, then calls onSuccess/onError/onAny on the UI thread:
+A future is simply a task which runs on a background thread pool, returns a result, then calls the onSuccess(result) callback or the onError(exception) callback.
 
 ```kotlin
 fun calculateTheMeaningOfLife() : Int
