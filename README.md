@@ -154,7 +154,7 @@ Will execute as follows:
 
 Note: Any exception will short-circuit the workflow. For instance, given the above example, let's assume ``f3`` will throw exception E. Execution will be canceled on all pending tasks (in this case, ``f5`` and any other remaining task in the parallel block). Then, ``Run.workflow`` method will throw E further. This is a fail-fast, transactional approach.
 
-Note: ``Run.workflow`` will block the current thread. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.future`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
+Note: ``Run.workflow`` will block the current thread. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.future`` if you are on the UI thread.
 
 Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.future {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Use the ``execute`` as it is a blocking API:
 
@@ -230,6 +230,15 @@ object ExceptionLogger
     }
 }
 ```
+
+Note: this is how various APIs handle exceptions:
+
+| API                                | Behavior                                                                                                                                                                                                                           |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ``Run.thread {}``                  | If the input closure throws an exception, it will be caught and logged.                                                                                                                                    |
+| ``Run.future {}``                  | If the input closure throws an exception, it will be caught and logged. Then, the ``onError(exception)`` callback will be called on the UI thread.                                                         |
+| ``Run.workflow {}``                | If any inner closure (the input closure, all closures given as arguments to ``task``, ``sequential`` and ``parallel``) throws an exception, it will short-circuit the workflow. The exception will be logged and thrown further. |
+| ``Actor.handleEvent``              | If the code inside ``handleEvent`` function throws an exception, it will be caught and logged. The actor will continue to await events.                                                                                            |
 
 ### License
 
