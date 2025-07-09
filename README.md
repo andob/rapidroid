@@ -204,6 +204,7 @@ class App : Application()
     {
         super.onCreate()
         Rapidroid.exceptionLogger = Rapidroid.ExceptionLogger { ex -> ExceptionLogger.log(ex) }
+        //in addition, it is also recommended to add Thread.setDefaultUncaughtExceptionHandler { ... } in order to log exceptions from all other threads
     }
 }
 
