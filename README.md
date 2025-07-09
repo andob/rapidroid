@@ -152,9 +152,9 @@ Will execute as follows:
 
 ![workflow](https://raw.githubusercontent.com/andob/rapidroid/master/workflow.png)
 
-Note: ``Run.workflow`` is a blocking call. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.future`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
-
 Note: Any exception will short-circuit the workflow. For instance, given the above example, let's assume ``f3`` will throw exception E. Execution will be canceled on all pending tasks (in this case, ``f5`` and any other remaining task in the parallel block). Then, ``Run.workflow`` method will throw E further. This is a fail-fast, transactional approach.
+
+Note: ``Run.workflow`` will block the current thread. Do not call it directly on the UI thread, always wrap it inside ``Run.thread`` or ``Run.future`` if you are on the UI thread. That is, use ``Run.thread { Run.workflow { ... } }`` or similar.
 
 Another small note on synchronicity (maybe it's not obvious). The code inside either ``Run.thread {}``, ``Run.future {}`` or ``task {}`` must either run synchronously (must block the current thread) or if it runs asynchronously, the inner thread must be joined into the parent thread. For instance, if you use Retrofit to make HTTP calls, do not call ``enqueue`` as it is an asynchronous API. Use the ``execute`` as it is a blocking API:
 
